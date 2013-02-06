@@ -22,7 +22,8 @@ commands to work, and there must be enough space on the drive
 containing the directory to contain both the database dump and the
 site file dump.
 
-* `dumpsite SITEROOT`
+`dumpsite SITEROOT`
+-------------------
 
   Creates a gzipped tar dump (.tgz file) containing a snapshot of the
   Drupal site with the given SITEROOT.  This dump file will contain a
@@ -56,7 +57,8 @@ site file dump.
    user passwords, so it's best to treat the dumpfile as sensitive
    material.
       
-* `loadsite [-d SITEROOT ] DUMPFILE`
+`loadsite [-d SITEROOT ] DUMPFILE`
+----------------------------------
 
   Loads a dumpfile written by `dumpsite` into a Drupal SITEROOT.  This
   involves doing the following:
