@@ -14,7 +14,7 @@ either case, as far as these DRUTILS scripts are concerned, SITEROOT
 always corresponds to the top level of the Drupal installation ---
 i.e.  the directory containing Drupal's index.php file.
 
-* dumpsite SITEROOT
+* `dumpsite SITEROOT`
 
   Creates a gzipped tar dump (.tgz file) containing a snapshot of the
   Drupal site with the given SITEROOT.  This dump file will contain a
@@ -48,20 +48,20 @@ i.e.  the directory containing Drupal's index.php file.
    user passwords, so it's best to treat the dumpfile as sensitive
    material.
       
-* loadsite [-d SITEROOT ] DUMPFILE
+* `loadsite [-d SITEROOT ] DUMPFILE`
 
   Loads a dumpfile written by `dumpsite` into a Drupal SITEROOT.  This
   involves doing the following:
   
-    1. Save a copy of the current `SITEROOT/sites/default/settings.php` file
-    2. Delete all existing files in SITEROOT
-    3. Restore the files from the dumpfile into SITEROOT
-    4. Replace `SITEROOT/sites/default/settings.php` with the one
-       saved in step 1 above
-    5. Delete everything (data and tables) from the site database
-    6. Restore everything (data and tables) in the site database from the
-       dumpfile
-
+        1. Save a copy of the current `SITEROOT/sites/default/settings.php` file
+        2. Delete all existing files in SITEROOT
+        3. Restore the files from the dumpfile into SITEROOT
+        4. Replace `SITEROOT/sites/default/settings.php` with the one
+           saved in step 1 above
+        5. Delete everything (data and tables) from the site database
+        6. Restore everything (data and tables) in the site database from the
+           dumpfile
+    
   Note that this process preseves the database connection details (usename,
   password, port, etc) details for the site.  The process will clear out
   the contents of the database, replacing them with the contents from
