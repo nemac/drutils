@@ -14,6 +14,14 @@ either case, as far as these DRUTILS scripts are concerned, SITEROOT
 always corresponds to the top level of the Drupal installation ---
 i.e.  the directory containing Drupal's index.php file.
 
+Note that these commands work by temporarily creating a subdirectory
+named ".stage" in the current directory, and using it as a staging
+area for creating or unpacking dumpfiles.  Therefore, the user must
+have write permission in the current directory in order for these
+commands to work, and there must be enough space on the drive
+containing the directory to contain both the database dump and the
+site file dump.
+
 * `dumpsite SITEROOT`
 
   Creates a gzipped tar dump (.tgz file) containing a snapshot of the
@@ -62,12 +70,16 @@ i.e.  the directory containing Drupal's index.php file.
         6. Restore everything (data and tables) in the site database from the
            dumpfile
     
-  Note that this process preseves the database connection details (usename,
-  password, port, etc) details for the site.  The process will clear out
-  the contents of the database, replacing them with the contents from
-  the dumpfile, but the database password is not modified.
+  Note that this process preseves the database connection details
+  (usename, password, port, etc) for the site.  The process will clear
+  out the contents of the database, replacing them with the contents
+  from the dumpfile, but the database password is not modified, since
+  the destination site's original settings.php file is retained.
   
   Note also that `loadsite` requires that SITEROOT already be set up
   as a Drupal siteroot directory, with a working database, and a
   `sites/default/settings.php` file containing valid Drupal database
-  connection details.
+  connection details.  Furthermore, the (major) version of Drupal
+  (e.g. Drupal 6, 7, 8, etc) for the destination SITEROOT must be
+  the same as the (major) version of Drupal for the site used to
+  create the dumpfile.
