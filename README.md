@@ -25,7 +25,7 @@ site file dump.
 `dumpsite SITEROOT`
 -------------------
 
-reates a gzipped tar dump (.tgz file) containing a snapshot of the
+Creates a gzipped tar dump (.tgz file) containing a snapshot of the
 rupal site with the given SITEROOT.  This dump file will contain a
 ump of the site MySQL database as well as copies of all files in
 he SITEROOT directory structure, with the single exception of the
@@ -44,11 +44,11 @@ he name of the dumpfile will be SITEROOT, with all slashes
 eplaced by dashes, followed by a timestamp, followed by the
 .tgz` suffix.  For example,
 
-    dumpsite /var/www.foobar.com/html
+        dumpsite /var/www.foobar.com/html
    
 would create a dump file named something like
 
-    var-www.foobar.com-html--2012-08-01--14-36-52.tgz
+        var-www.foobar.com-html--2012-08-01--14-36-52.tgz
    
 Note that the resulting dumpfile does not contain the site's
 `sites/default/settings.php` file, so it does not include sensitive
