@@ -164,3 +164,25 @@ def get_databases(db_su, db_su_pw):
             db_su,
             db_su_pw)).read()
     return [d for d in  result.split("\n") if (d != 'Db' and d != '')]
+
+def confirm_with_yes(prompt):
+    ans = raw_input(prompt)
+    return ans.lower()=="yes"
+
+def drop_user(user, db_su, db_su_pw):
+    # Delete the given user from MySql
+    success = command_success(("mysql --database=mysql --host=localhost --user=%s --password=%s "
+                      + "-e \"delete from user where User='%s'\"") % (
+            db_su,
+            db_su_pw,
+            user))
+    return success
+
+def drop_database(db, db_su, db_su_pw):
+    # Delete the given user from MySql
+    success = command_success(("mysql --database=mysql --host=localhost --user=%s --password=%s "
+                      + "-e \"drop database %s\"") % (
+            db_su,
+            db_su_pw,
+            db))
+    return success

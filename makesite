@@ -87,7 +87,7 @@ if __name__ == "__main__":
     # Install the site, creating the database and user along the way, using a random database password
     #
     password = drutils.generate_random_password()
-    drutils.system("(cd %s ; drush site-install standard --db-su=%s --db-su-pw=%s --db-url=mysql://%s:%s@localhost/%s --site-name=%s)" % (
+    drutils.system("(cd %s ; drush -y -q site-install standard --db-su=%s --db-su-pw=%s --db-url=mysql://%s:%s@localhost/%s --site-name=%s)" % (
         SITEROOT,
         DB_SU,
         DB_SU_PW,

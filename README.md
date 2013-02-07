@@ -38,14 +38,8 @@ that exact version of Drupal.  If VERSION is a single number, like "7"
 or "6", `makesite` will download the latest recommended release of
 that major version.
 
-`makesite` takes care of creating a MySql datbase and user for the
-site, and in order to be able to do that, it needs access to a MySql
-user account that has the permission to create databases and users,
-and to grant privileges.  If the `--dbsu=USER:PASSWORD` option is
-present, `makesite` uses the username and password from it.  If the
-`--dbsu=USER:PASSWORD` option is not present, `makesite` looks for the
-DRUTILS_DB_SU and DRUTILS_DB_SU_PW environment variables; see the
-"Environment Variables" section below for details.
+This script needs a database superuser account; see "Database
+Superuser Account" below for details.
 
 `makesite` generates a random password for the site database, and also
 sets the password for the site's _admin_ user to be the same as the
@@ -115,6 +109,34 @@ SITEROOT.  This might be the same as the site's _admin_ account
 password, if the site was created with `makesite` or loaded with
 `loadsite`.
 
+`dblist [--dbsu=USER:PASSWORD]`
+-------------------------------
+
+Print out a list of all the MySql databases in the local MySql.
+This script needs a database superuser account; see "Database
+Superuser Account" below for details.
+
+
+`dbdrop [--dbsu=USER:PASSWORD] NAME`
+------------------------------------
+
+Drop the database and/or user with the given NAME.  This script needs
+a database superuser account; see "Database Superuser Account" below
+for details.
+
+
+Database Superuser Account
+--------------------------
+
+Some of the Drutils scripts need the ability to connect to the local
+MySql server using an account that has the permission to examine and
+create databases and users, and to grant privileges. These scripts all
+accept an optional argument of the form `--dbsu=USER:PASSWORD`.  If
+that argument is present, the database superuser username and password
+are taken from it.  If the `--dbsu=USER:PASSWORD` option is not
+present, the scripts look for the DRUTILS_DB_SU and DRUTILS_DB_SU_PW
+environment variables; see the "Environment Variables" section below
+for details.
 
 Environment Variables
 ---------------------
