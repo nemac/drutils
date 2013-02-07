@@ -2,7 +2,7 @@ from time import localtime, strftime
 import re, os, tarfile, random
 
 def system(command):
-    print command
+    #print command
     return os.system(command)
 
 def command_success(command):
@@ -26,6 +26,26 @@ def get_base_timestamp(base):
     if match:
         return match.group(0)
     return ""
+
+def standardize_siteroot(SITEROOT):
+    # If SITEROOT is not an absolute path (starts with a '/'), and if there is no
+    # directory at SITEROOT interpreted as a relative path, return a modified
+    # copy of SITEROOT which has been prepended with the value of the
+    # DRUTILS_SITE_PARENT environment variable, if such an environment variable
+    # is set.  If there is no such env var, return SITEROOT unmodified.
+    #
+    # This function does NOT validate that the resulting SITEROOT value is
+    # a valid Drupal site root directory.
+    #
+    SITEROOT = re.sub(r'/$', '', SITEROOT) # remove any trailing '/' from SITEROOT
+    if SITEROOT.startswith("/"):
+        return SITEROOT
+    if os.path.exists(SITEROOT):
+        return SITEROOT
+    if 'DRUTILS_SITE_PARENT' not in os.environ:
+        return SITEROOT
+    parent = re.sub(r'/$', '', os.environ['DRUTILS_SITE_PARENT'])
+    return os.path.join(parent, SITEROOT)
 
 def validate_siteroot(SITEROOT):
     # Return True or False, depending on whether SITEROOT seems to be
@@ -84,6 +104,12 @@ def get_db_url(siteroot):
     password = find_arg(sql_connect, "password")
     return "mysql://%s:%s@%s/%s" % (user,password,host,database)
 
+def get_db_password(siteroot):
+    # Return the database password for a site, as read from its settings.php file
+    sql_connect = os.popen('drush -r %s sql-connect' % siteroot).read().strip()
+    password = find_arg(sql_connect, "password")
+    return password
+
 def generate_random_password():
     random.seed()
     letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'm',
@@ -130,3 +156,11 @@ def database_exists(db, db_su, db_su_pw):
             db)).read()
     # Above query results are empty if database does not exists
     return result!=''
+
+def get_databases(db_su, db_su_pw):
+    # Return a list of all databases
+    result = os.popen(("mysql --database=mysql --host=localhost --user=%s --password=%s "
+                      + "-e \"select Db from db\"") % (
+            db_su,
+            db_su_pw)).read()
+    return [d for d in  result.split("\n") if (d != 'Db' and d != '')]

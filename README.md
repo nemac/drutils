@@ -1,18 +1,25 @@
-DRUTILS - Drupal/Drush Utilities
+Drutils - Drupal/Drush Utilities
 ================================
 
 This project contains a collection of scripts that facilitate managing
 Drupal sites with `drush`.  These scripts are written to work on
 Linux and Mac OS X systems; they have not been tested on Windows.
 
-All of these scripts make use of the concept of a SITEROOT, which is a
+All Drutils scripts make use of the concept of a "site root", which is a
 top level directory containing a Drupal installation.  Typically the
-SITEROOT directory corresponds exactly with a web server (Apache)
+site root directory corresponds exactly with a web server (Apache)
 document root directory for a virtual host, but it is also possible to
 have multiple Drupal installations inside the same virtual host.  In
-either case, as far as these DRUTILS scripts are concerned, SITEROOT
+either case, as far as these Drutils scripts are concerned, the site root
 always corresponds to the top level of the Drupal installation ---
 i.e.  the directory containing Drupal's index.php file.
+
+Normally the SITEROOT argument to all Drutils scripts should be the
+absolute path to a Drupal site root directory.  If you create a lot of
+Drupal sites under a common parent directory, however, you can use the
+environment variable DRUTILS_SITE_PARENT to set a parent directory
+that all SITEROOT value will be interpreted relative to; see the
+"Environment Variables" section below for details.
 
 `makesite [--dbsu=USER:PASSWORD] [--version=VERSION] SITEROOT`
 --------------------------------------------------------------
@@ -34,12 +41,11 @@ that major version.
 `makesite` takes care of creating a MySql datbase and user for the
 site, and in order to be able to do that, it needs access to a MySql
 user account that has the permission to create databases and users,
-and to grant privileges.  By default, if there is no
-`--dbsu=USER:PASSWORD` option given, `makesite` examines the
-environment variables DRUTILS_DB_SU and DRUTILS_DB_SU_PW, which should
-be the account username and password, respectively.  If the
-`--dbsu=USER:PASSWORD` option is present, the username and password
-are taken from it and the environment variables are ignored.
+and to grant privileges.  If the `--dbsu=USER:PASSWORD` option is
+present, `makesite` uses the username and password from it.  If the
+`--dbsu=USER:PASSWORD` option is not present, `makesite` looks for the
+DRUTILS_DB_SU and DRUTILS_DB_SU_PW environment variables; see the
+"Environment Variables" section below for details.
 
 `makesite` generates a random password for the site database, and also
 sets the password for the site's _admin_ user to be the same as the
@@ -92,3 +98,29 @@ This means that after restoring, the site running at SITEROOT will
 still use the same database that the site running at that location
 used before the restore, but the contents of that database will have
 been replaced by the restore process.  
+
+After restoring the site, `loadsite` also sets the password for the
+site's _admin_ user to be the same as the database password.  If you
+want the site's _admin_ user to have a different password, you can
+change it immediately after `makesite` finishes by running a command
+like:
+
+    drush -r SITEROOT user-password admin --password="NEWPASSWORD"
+
+`dbpw SITEROOT`
+---------------
+
+Print out the database password for the Drupal site at the given
+SITEROOT.  This might be the same as the site's _admin_ account
+password, if the site was created with `makesite` or loaded with
+`loadsite`.
+
+
+Environment Variables
+---------------------
+
+ * DRUTILS_SITE_PARENT
+ * DRUTILS_DB_SU
+ * DRUTILS_DB_SU_PW
+
+Will write more about these soon.

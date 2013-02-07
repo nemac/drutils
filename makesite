@@ -41,7 +41,7 @@ if __name__ == "__main__":
             else:
                 usage()
         else:
-            SITEROOT = re.sub(r'/$', '', arg) # remove any trailing '/' from SITEROOT
+            SITEROOT = drutils.standardize_siteroot(arg)
     #
     # If we didn't get DB_SU info from the args, check for it in environment vars:
     # 

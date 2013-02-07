@@ -1,0 +1,28 @@
+#! /usr/bin/python
+
+# Script to print out the database password for a Drupal site, as read
+# from the site's settings.php file. See README.md for more details.
+#
+# Author: Mark Phillips <mphillip@unca.edu>
+
+import sys, re
+sys.path.append(".") # this line gets replaced by `make install`
+import drutils
+
+def usage():
+    print "usage: dbpw SITEROOT"
+    sys.exit(-1)
+
+if __name__ == "__main__":
+    # Get the SITEROOT argument
+    if len(sys.argv) != 2:
+        usage()
+    SITEROOT = drutils.standardize_siteroot(sys.argv[1])
+
+    # Validate the SITEROOT
+    if not drutils.validate_siteroot(SITEROOT):
+        print "%s does not appear to be a valid Drupal site root directory" % SITEROOT
+        sys.exit(-1)
+
+    # Print the password
+    print drutils.get_db_password(SITEROOT)

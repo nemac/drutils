@@ -7,7 +7,7 @@
 #
 # Author: Mark Phillips <mphillip@unca.edu>
 
-import sys
+import sys, re
 sys.path.append(".") # this line gets replaced by `make install`
 import drutils
 
@@ -19,7 +19,7 @@ if __name__ == "__main__":
     # Get the SITEROOT argument
     if len(sys.argv) != 2:
         usage()
-    SITEROOT = re.sub(r'/$', '', sys.argv[1]) # remove any trailing '/' from SITEROOT
+    SITEROOT = drutils.standardize_siteroot(sys.argv[1])
 
     # Validate the SITEROOT
     if not drutils.validate_siteroot(SITEROOT):
