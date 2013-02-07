@@ -4,7 +4,7 @@ Version: 1.1
 Release: 1
 License: GPL
 Group: Web Development
-Source: myprog-1.0.1.tgz
+Source: %{name}-%{version}.tar.gz
 URL: http://github.com/nemac/drutils
 BuildArch: noarch
 BuildRoot: %{_tmppath}/%{name}-root
