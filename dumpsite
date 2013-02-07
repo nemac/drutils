@@ -49,5 +49,9 @@ if __name__ == "__main__":
         # Write the final dump file
         drutils.system("(cd .stage ; tar cfz - %s) > %s" % (base, dumpfile))
         print "Wrote %s" % dumpfile
+    except Exception as e:
+        print "Error: ", e
+        if os.path.exists(dumpfile):
+            os.unlink(dumpfile)
     finally:
         drutils.system("/bin/rm -rf .stage");
