@@ -6,7 +6,7 @@
 #
 # Author: Mark Phillips <mphillip@unca.edu>
 
-import sys
+import sys, os, socket
 sys.path.append(".") # this line gets replaced by `make install`
 import drutils
 
@@ -20,34 +20,34 @@ if __name__ == "__main__":
         sys.exit(-1)
     SITEROOT = sys.argv[1]
     # Validate the SITEROOT
-    if not validate_siteroot(SITEROOT):
+    if not drutils.validate_siteroot(SITEROOT):
         print "%s does not appear to be a valid Drupal site root directory" % SITEROOT
         sys.exit(-1)
     # Create the dumpfile name
-    dumpfile = generate_dumpfile_name(SITEROOT)
-    base = get_dumpfile_base(dumpfile)
+    dumpfile = drutils.generate_dumpfile_name(SITEROOT)
+    base = drutils.get_dumpfile_base(dumpfile)
     # Clear out any existing .stage directory
-    system("/bin/rm -rf .stage");
+    drutils.system("/bin/rm -rf .stage");
     try:
         # Create the dump "base" directory -- a subdirectory inside the .stage dir, whose
         # name is the base part of the dumpfile name:
         basepath = os.path.join(".stage", base)
         os.makedirs(basepath)
         # Create a gzipped database dump file in the base dir
-        system("(cd %s ; drush sql-dump) | gzip > %s/%s.sql.gz" % (SITEROOT, basepath, base))
+        drutils.system("(cd %s ; drush sql-dump) | gzip > %s/%s.sql.gz" % (SITEROOT, basepath, base))
         # Create a compressed tar dump of all site files in the base dir
-        system("(cd %s ; tar -c -z -f - --exclude=./sites/default/settings.php .) > %s/%s.tgz" % (SITEROOT, basepath, base))
+        drutils.system("(cd %s ; tar -c -z -f - --exclude=./sites/default/settings.php .) > %s/%s.tgz" % (SITEROOT, basepath, base))
         # Create a file named META in the base dir, containing various metadata fields about the dump:
-        [N,M] = get_drupal_version(SITEROOT)
+        [N,M] = drutils.get_drupal_version(SITEROOT)
         f = open(os.path.join(basepath, "META"), "w")
         f.write("SITEROOT: %s\n" % SITEROOT)
         f.write("host: %s\n" % socket.gethostname())
-        f.write("drupal major version: %s\n" % N)
-        f.write("drupal minor version: %s\n" % M)
-        f.write("dump time: %s\n" % get_base_timestamp(base))
+        f.write("drupal-major-version: %s\n" % N)
+        f.write("drupal-minor-version: %s\n" % M)
+        f.write("dump-time: %s\n" % drutils.get_base_timestamp(base))
         f.close()
         # Write the final dump file
-        system("(cd .stage ; tar cfz - %s) > %s" % (base, dumpfile))
+        drutils.system("(cd .stage ; tar cfz - %s) > %s" % (base, dumpfile))
         print "Wrote %s" % dumpfile
     finally:
-        system("/bin/rm -rf .stage");
+        drutils.system("/bin/rm -rf .stage");

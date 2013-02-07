@@ -1,5 +1,5 @@
 from time import localtime, strftime
-import sys, re, os, socket
+import re, os
 
 def system(command):
     #print command
