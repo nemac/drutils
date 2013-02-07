@@ -14,6 +14,42 @@ either case, as far as these DRUTILS scripts are concerned, SITEROOT
 always corresponds to the top level of the Drupal installation ---
 i.e.  the directory containing Drupal's index.php file.
 
+`makesite [--dbsu=USER:PASSWORD] [--version=VERSION] SITEROOT`
+--------------------------------------------------------------
+
+Create a new Drupal site at the location specified by SITEROOT.
+The SITEROOT directory must not already exist, but its parent
+directory should already exist, and the user running `makesite`
+should have write permission in that parent directory.
+
+By default, `makesite` downloads whatever the latest version of Drupal
+is from drupal.org and installs it into SITEROOT.  You can explicitly
+specify a different version with the `--version=VERSION` option;
+VERSION should be a Drupal version number.  If VERSION is a full
+version number, such as "7.10" or "6.12", `makesite` will download
+that exact version of Drupal.  If VERSION is a single number, like "7"
+or "6", `makesite` will download the latest recommended release of
+that major version.
+
+`makesite` takes care of creating a MySql datbase and user for the
+site, and in order to be able to do that, it needs access to a MySql
+user account that has the permission to create databases and users,
+and to grant privileges.  By default, if there is no
+`--dbsu=USER:PASSWORD` option given, `makesite` examines the
+environment variables DRUTILS_DB_SU and DRUTILS_DB_SU_PW, which should
+be the account username and password, respectively.  If the
+`--dbsu=USER:PASSWORD` option is present, the username and password
+are taken from it and the environment variables are ignored.
+
+`makesite` generates a random password for the site database, and also
+sets the password for the site's _admin_ user to be the same as the
+database password.  If you want the site's _admin_ user to have a
+different password, you can change it immediately after `makesite`
+finishes by running a command like:
+
+    drush -r SITEROOT user-password admin --password="NEWPASSWORD"
+
+
 `dumpsite SITEROOT`
 -------------------
 
