@@ -1,0 +1,128 @@
+#! /usr/bin/python
+
+# Script to create a new Drupal site.  This is really just a
+# convenient wrapper around "drush dl" and "drush site-install".  See
+# README.md for more details.
+#
+# Author: Mark Phillips <mphillip@unca.edu>
+
+import sys, re, os
+sys.path.append(".") # this line gets replaced by `make install`
+import drutils
+
+def usage():
+    print "usage: makesite [--dbsu=USER:PASSWORD] [--version=VERSION] SITEROOT"
+    sys.exit(-1)
+
+if __name__ == "__main__":
+    #
+    # Process the arguments
+    #
+    DB_SU    = None
+    DB_SU_PW = None
+    SITEROOT = None
+    VERSION = None
+    sys.argv.pop(0)
+    while True:
+        if len(sys.argv)==0:
+            break
+        arg = sys.argv.pop(0)
+        if arg.startswith("--dbsu"):
+            match = re.match(r'^--dbsu=([^:]+):(.*)$', arg)
+            if match:
+                DB_SU    = match.group(1)
+                DB_SU_PW = match.group(2)
+            else:
+                usage()
+        if arg.startswith("--version"):
+            match = re.match(r'^--version=(.+)$', arg)
+            if match:
+                VERSION = match.group(1)
+            else:
+                usage()
+        else:
+            SITEROOT = re.sub(r'/$', '', arg) # remove any trailing '/' from SITEROOT
+    #
+    # If we didn't get DB_SU info from the args, check for it in environment vars:
+    # 
+    if DB_SU==None:
+        try:
+            DB_SU    = os.environ['DRUTILS_DB_SU']
+            DB_SU_PW = os.environ['DRUTILS_DB_SU_PW']
+        except:
+            pass
+    #
+    # Validate the args
+    #
+    if DB_SU==None or DB_SU_PW==None:
+        print "Can't determine database superuser account or password."
+        usage()
+    if not drutils.validate_db_su_credentials(DB_SU, DB_SU_PW):
+        print "The specified database superuser account or password is invalid."
+        usage()
+    if SITEROOT==None:
+        usage()
+    if os.path.exists(SITEROOT):
+        print "Site root directory %s already exists; refusing to overwrite it." % SITEROOT
+        sys.exit(-1)
+    siteparent = os.path.abspath(os.path.join(SITEROOT,os.path.pardir))
+    if not os.path.exists(siteparent):
+        print "Site parent directory %s does not exist; please create it first." % siteparent
+        sys.exit(-1)
+    sitebase = os.path.basename(SITEROOT)
+    #
+    # Check to make sure there is not already a database or database user named `sitebase`
+    #
+    if drutils.database_user_exists(sitebase, DB_SU, DB_SU_PW) or drutils.database_exists(sitebase, DB_SU, DB_SU_PW):
+        print "There is already a database and/or database user named '%s'; please choose another site name." % sitebase
+        sys.exit(-1)
+    #
+    # Download Drupal into the SITEROOT (this creates SITEROOT)
+    #
+    dltarget = "drupal"
+    if VERSION!=None:
+        dltarget = dltarget + "-" + VERSION
+    drutils.system("(cd %s ; drush dl %s --drupal-project-rename=%s)" % (siteparent, dltarget, sitebase))
+    #
+    # Install the site, creating the database and user along the way, using a random database password
+    #
+    password = drutils.generate_random_password()
+    drutils.system("(cd %s ; drush site-install standard --db-su=%s --db-su-pw=%s --db-url=mysql://%s:%s@localhost/%s --site-name=%s)" % (
+        SITEROOT,
+        DB_SU,
+        DB_SU_PW,
+        sitebase,
+        password,
+        sitebase,
+        sitebase))
+    #
+    # Set the site admin user password to the same as the database password:
+    #
+    drutils.system("(cd %s ; drush user-password admin --password=\"%s\")" % (SITEROOT, password))
+
+
+###    print 'DB_SU = %s' % DB_SU
+###    print 'DB_SU_PW = %s' % DB_SU_PW
+###    print 'SITEROOT = %s' % SITEROOT
+###    print 'SITEROOT parent = %s' % siteparent
+###    print 'SITEROOT base = %s' % sitebase
+###    print 'VERSION = %s' % VERSION
+
+
+
+###    if DUMPFILE==None:
+###        usage()
+###
+###
+###
+###drush dl drupal --drupal-project-rename=example
+###cd example
+###
+### --db-su=<root>                            Account to use when creating a new database. Must have Grant permission (mysql only). Optional.                                             
+### --db-su-pw=<pass>                         Password for the "db-su" account. Optional.                                                                                                 
+###
+###DB_SU
+###DB_SU_PW
+###
+###drush site-install standard --db-url=mysql://[db_user]:[db_pass]@localhost/[db_name] --site-name=Example
+###

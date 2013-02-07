@@ -6,7 +6,7 @@
 #
 # Author: Mark Phillips <mphillip@unca.edu>
 
-import sys, os, socket
+import sys
 sys.path.append(".") # this line gets replaced by `make install`
 import drutils
 
@@ -28,7 +28,7 @@ if __name__ == "__main__":
         if arg == "-d":
             if len(sys.argv)==0:
                 usage()
-            SITEROOT = sys.argv.pop(0)
+            SITEROOT = re.sub(r'/$', '', sys.argv.pop(0)) # remove any trailing '/' from SITEROOT
         else:
             DUMPFILE = arg
     if DUMPFILE==None:

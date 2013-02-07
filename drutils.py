@@ -1,8 +1,8 @@
 from time import localtime, strftime
-import re, os, tarfile
+import re, os, tarfile, random
 
 def system(command):
-    #print command
+    print command
     return os.system(command)
 
 def command_success(command):
@@ -84,3 +84,49 @@ def get_db_url(siteroot):
     password = find_arg(sql_connect, "password")
     return "mysql://%s:%s@%s/%s" % (user,password,host,database)
 
+def generate_random_password():
+    random.seed()
+    letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'm',
+               'n', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+               'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'M',
+               'N', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
+    digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    N = 10
+    chars = []
+    for i in range(0,N):
+        if (random.random() < 0.67):
+            chars.append(letters[ random.randint(0,len(letters)-1) ])
+        else:
+            chars.append(digits[ random.randint(0,len(digits)-1) ])
+    return "".join(chars)
+
+
+def validate_db_su_credentials(db_su, db_su_pw):
+    # Check to make sure that the specified superuser credentials (db_su is username, db_su_pw is password)
+    # can be used to connect to MySql
+    result = os.popen(("mysql --database=mysql --host=localhost --user=%s --password=%s "
+                      + "-e \"select count(*) as COUNT from db\"") % (
+            db_su,
+            db_su_pw)).read()
+    # This checks to make sure that the result of the above query consists of COUNT followed by a number:
+    return re.search(r'COUNT\s+\d+', result)!=None
+
+def database_user_exists(user, db_su, db_su_pw):
+    # Return True if the specified database user exists, False if not
+    result = os.popen(("mysql --database=mysql --host=localhost --user=%s --password=%s "
+                      + "-e \"select User from user where User='%s'\"") % (
+            db_su,
+            db_su_pw,
+            user)).read()
+    # Above query results are empty if user does not exists
+    return result!=''
+
+def database_exists(db, db_su, db_su_pw):
+    # Return True if the specified database exists, False if not
+    result = os.popen(("mysql --database=mysql --host=localhost --user=%s --password=%s "
+                      + "-e \"select Db from db where Db='%s'\"") % (
+            db_su,
+            db_su_pw,
+            db)).read()
+    # Above query results are empty if database does not exists
+    return result!=''
