@@ -12,6 +12,7 @@ import drutils
 
 def usage():
     print "usage: loadsite [-d SITEROOT] DUMPFILE"
+    drutils.common_usage();
     sys.exit(-1)
 
 if __name__ == "__main__":

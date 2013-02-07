@@ -12,6 +12,7 @@ import drutils
 
 def usage():
     print "usage: makesite [--dbsu=USER:PASSWORD] [--version=VERSION] SITEROOT"
+    drutils.common_usage();
     sys.exit(-1)
 
 if __name__ == "__main__":

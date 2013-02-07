@@ -11,6 +11,7 @@ import drutils
 
 def usage():
     print "usage: dbdrop [--dbsu=USER:PASSWORD] NAME"
+    drutils.common_usage();
     sys.exit(-1)
 
 if __name__ == "__main__":

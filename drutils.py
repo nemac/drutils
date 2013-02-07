@@ -5,6 +5,9 @@ def system(command):
     #print command
     return os.system(command)
 
+def common_usage():
+    print "See https://github.com/nemac/drutils/blob/master/README.md for more details."
+
 def command_success(command):
     # Execute a command in a subshell and return True if it ran successfully, False if not
     return system(command)==0
