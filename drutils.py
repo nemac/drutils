@@ -1,5 +1,5 @@
 from time import localtime, strftime
-import re, os
+import re, os, tarfile
 
 def system(command):
     #print command
@@ -51,4 +51,36 @@ def get_drupal_version(SITEROOT):
         if match:
             return [match.group(1), match.group(2)]
     return None
+
+def get_siteroot_from_dumpfile(dumpfile):
+    f = tarfile.open(dumpfile, 'r')
+    m = f.getmember('MANIFEST.ini')
+    fp = f.extractfile(m)
+    docroot = None
+    for line in fp:
+        match = re.search(r'docroot\s*=\s*"([^"]*)"', line)
+        if match:
+            docroot = match.group(1)
+            break
+    fp.close()
+    f.close()
+    return docroot
+
+def find_arg(string, arg):
+    # Search a string for a substring of the form
+    #    --arg=value
+    # and return the value part
+    match = re.search(r'--%s=(\S*)' % arg, string)
+    if match:
+        return match.group(1)
+    return None
+
+def get_db_url(siteroot):
+    # Return a Drupal-6 style db-url for a given site root
+    sql_connect = os.popen('drush -r %s sql-connect' % siteroot).read().strip()
+    database = find_arg(sql_connect, "database")
+    host = find_arg(sql_connect, "host")
+    user = find_arg(sql_connect, "user")
+    password = find_arg(sql_connect, "password")
+    return "mysql://%s:%s@%s/%s" % (user,password,host,database)
 

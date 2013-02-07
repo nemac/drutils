@@ -1,0 +1,63 @@
+#! /usr/bin/python
+
+# Script to load a dumpfile written by `dumpsite` into a Drupal site.
+# This is really just a convenient wrapper around "drush
+# archive-restore".  See README.md for more details.
+#
+# Author: Mark Phillips <mphillip@unca.edu>
+
+import sys, os, socket
+sys.path.append(".") # this line gets replaced by `make install`
+import drutils
+
+def usage():
+    print "usage: loadsite [-d SITEROOT] DUMPFILE"
+    sys.exit(-1)
+
+if __name__ == "__main__":
+    #
+    # Process the arguments
+    #
+    SITEROOT = None
+    DUMPFILE = None
+    sys.argv.pop(0)
+    while True:
+        if len(sys.argv)==0:
+            break
+        arg = sys.argv.pop(0)
+        if arg == "-d":
+            if len(sys.argv)==0:
+                usage()
+            SITEROOT = sys.argv.pop(0)
+        else:
+            DUMPFILE = arg
+    if DUMPFILE==None:
+        usage()
+    #
+    # If no SITEROOT was specified, read it from the dumpfile
+    #
+    if SITEROOT==None:
+        SITEROOT = drutils.get_siteroot_from_dumpfile(DUMPFILE)
+        if SITEROOT==None:
+            print "Can't determine site root directory from dump file."
+            sys.exit(-1)
+    #
+    # Validate the SITEROOT
+    #
+    if not drutils.validate_siteroot(SITEROOT):
+        print "%s does not appear to be a valid Drupal site root directory" % SITEROOT
+        sys.exit(-1)
+    #
+    # Get the database connection url from the site currently at SITEROOT
+    #
+    db_url = drutils.get_db_url(SITEROOT)
+    if db_url==None:
+        print "Can't determine database connection info from site at %s" % SITEROOT
+        sys.exit(-1)
+    #
+    # Load the dumpfile, using the database connection info loaded from SITEROOT
+    #
+    if drutils.command_success("drush -q archive-restore --destination=%s --db-url=%s --overwrite %s" % (SITEROOT, db_url, DUMPFILE)):
+        print "Loaded %s to site at %s" % (DUMPFILE, SITEROOT)
+    else:
+        print "An error occurred while restoring the dumpfile."
