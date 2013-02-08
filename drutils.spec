@@ -21,19 +21,19 @@ drush commands.
 
 %install
 rm -rf %{buildroot}
-%makeinstall
+make prefix=%{buildroot}/usr dest_prefix=/usr install
 
 %clean
 rm -rf %{buildroot}
 
 %files
-${_libdir}/drutils.py
-${_bindir}/dumpsite
-${_bindir}/loadsite
-${_bindir}/makesite
-${_bindir}/dblist
-${_bindir}/dbdrop
-${_bindir}/dbpw
+/usr/lib/drutils/drutils.py
+/usr/bin/dumpsite
+/usr/bin/loadsite
+/usr/bin/makesite
+/usr/bin/dblist
+/usr/bin/dbdrop
+/usr/bin/dbpw
 
 %changelog
 * Thu Feb 07 2013 Mark Phillips <embeepea@git> 1.3-1
