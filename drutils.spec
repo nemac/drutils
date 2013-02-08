@@ -1,6 +1,6 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
-Version: 1.2
+Version: 1.3
 Release: 1
 License: GPL
 Group: Web Development
@@ -36,6 +36,9 @@ ${_bindir}/dbdrop
 ${_bindir}/dbpw
 
 %changelog
+* Thu Feb 07 2013 Mark Phillips <embeepea@git> 1.3-1
+- tweaks Makefile (embeepea@git)
+
 * Thu Feb 07 2013 Mark Phillips <embeepea@git> 1.2-1
 - tweaks spec file (embeepea@git)
 
