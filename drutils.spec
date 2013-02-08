@@ -1,6 +1,6 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
-Version: 1.4
+Version: 1.5
 Release: 1
 License: GPL
 Group: Web Development
@@ -36,6 +36,11 @@ rm -rf %{buildroot}
 /usr/bin/dbpw
 
 %changelog
+* Thu Feb 07 2013 Mark Phillips <embeepea@git> 1.5-1
+- edits DEVNOTES (embeepea@git)
+- adds DEVNOTES.md (embeepea@git)
+- fix typo in Makefile (embeepea@git)
+
 * Thu Feb 07 2013 Mark Phillips <embeepea@git> 1.4-1
 - more spec tweaks (embeepea@git)
 - tweaks spec file (embeepea@git)
