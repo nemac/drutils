@@ -27,7 +27,7 @@ make prefix=%{buildroot}/usr dest_prefix=/usr install
 rm -rf %{buildroot}
 
 %files
-/usr/lib/drutils/drutils.py
+/usr/lib/drutils/drutils.py*
 /usr/bin/dumpsite
 /usr/bin/loadsite
 /usr/bin/makesite
