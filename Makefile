@@ -2,7 +2,7 @@ prefix=/usr/local
 libdir=${prefix}/lib/drutils
 bindir=${prefix}/bin
 dest_prefix=${prefix}
-dest_libdir=${dist_prefix}/lib/drutils
+dest_libdir=${dest_prefix}/lib/drutils
 EDIT_LIB_DIR=sed -e 's|^sys\.path\.append.*this line gets replaced.*$$|sys.path.append("${dest_libdir}")|'
 
 .PHONY: _always
