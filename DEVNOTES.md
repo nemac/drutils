@@ -3,7 +3,8 @@ Workflow for building rpm releases using tito
 
 0. Do this just once, to initialize the project in tito:
 
-    tito init
+        tito init
+
 
 1. Edit/Test
 
@@ -13,6 +14,7 @@ Workflow for building rpm releases using tito
 
     3. Build: tito build --rpm --test
 
+
 2. Finalize a release
 
     1. Tag: tito tag --accept-auto-changelog
@@ -20,3 +22,6 @@ Workflow for building rpm releases using tito
     2. Push: git push && git push $ORIGIN $TAG
 
     3. Build: tito build --rpm
+
+
+For more info, see *man tito*, or https://github.com/dgoodwin/tito.
