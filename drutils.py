@@ -175,7 +175,7 @@ def confirm_with_yes(prompt):
 def drop_user(user, db_su, db_su_pw):
     # Delete the given user from MySql
     success = command_success(("mysql --database=mysql --host=localhost --user=%s --password=%s "
-                      + "-e \"delete from user where User='%s'\"") % (
+                      + "-e \"drop user %s@localhost\"") % (
             db_su,
             db_su_pw,
             user))

@@ -62,3 +62,7 @@ if __name__ == "__main__":
         print "Loaded %s to site at %s" % (DUMPFILE, SITEROOT)
     else:
         print "An error occurred while restoring the dumpfile."
+    #
+    # Change the permissions on the sites/default/files directory in the site just loaded
+    #
+    drutils.system("chmod -R o+w %s/sites/default/files" % SITEROOT)

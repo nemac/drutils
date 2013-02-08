@@ -52,20 +52,26 @@ if __name__ == "__main__":
     database_exists = drutils.database_exists(NAME, DB_SU, DB_SU_PW)
 
     if user_exists and database_exists:
-        if drutils.confirm_with_yes("really drop database and user '%s'? [NO|yes] " % NAME):
+        if drutils.confirm_with_yes("really drop database and user '%s'? [type 'yes' (without the quotes) to confirm] " % NAME):
             drutils.drop_database(NAME, DB_SU, DB_SU_PW)
             print "dropped database '%s'" % NAME;
             drutils.drop_user(NAME, DB_SU, DB_SU_PW)
             print "dropped user '%s'" % NAME;
+        else:
+            print "Nothing dropped."
     elif not user_exists and database_exists:
         print "No user named '%s' found." % NAME
-        if drutils.confirm_with_yes("really drop database '%s'? [NO|yes] " % NAME):
+        if drutils.confirm_with_yes("really drop database '%s'? [type 'yes' (without the quotes) to confirm] " % NAME):
             drutils.drop_database(NAME, DB_SU, DB_SU_PW)
             print "dropped database '%s'" % NAME;
+        else:
+            print "Nothing dropped."
     elif user_exists and not database_exists:
         print "No database named '%s' found." % NAME
-        if drutils.confirm_with_yes("really drop user '%s'? [NO|yes] " % NAME):
+        if drutils.confirm_with_yes("really drop user '%s'? [type 'yes' (without the quotes) to confirm] " % NAME):
             drutils.drop_user(NAME, DB_SU, DB_SU_PW)
             print "dropped user '%s'" % NAME;
+        else:
+            print "Nothing dropped."
     else:
         print "No database or user named '%s' found." % NAME;

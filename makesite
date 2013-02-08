@@ -100,30 +100,7 @@ if __name__ == "__main__":
     # Set the site admin user password to the same as the database password:
     #
     drutils.system("(cd %s ; drush user-password admin --password=\"%s\")" % (SITEROOT, password))
-
-
-###    print 'DB_SU = %s' % DB_SU
-###    print 'DB_SU_PW = %s' % DB_SU_PW
-###    print 'SITEROOT = %s' % SITEROOT
-###    print 'SITEROOT parent = %s' % siteparent
-###    print 'SITEROOT base = %s' % sitebase
-###    print 'VERSION = %s' % VERSION
-
-
-
-###    if DUMPFILE==None:
-###        usage()
-###
-###
-###
-###drush dl drupal --drupal-project-rename=example
-###cd example
-###
-### --db-su=<root>                            Account to use when creating a new database. Must have Grant permission (mysql only). Optional.                                             
-### --db-su-pw=<pass>                         Password for the "db-su" account. Optional.                                                                                                 
-###
-###DB_SU
-###DB_SU_PW
-###
-###drush site-install standard --db-url=mysql://[db_user]:[db_pass]@localhost/[db_name] --site-name=Example
-###
+    #
+    # Change the permissions on the sites/default/files directory in the site just loaded
+    #
+    drutils.system("chmod -R o+w %s/sites/default/files" % SITEROOT)

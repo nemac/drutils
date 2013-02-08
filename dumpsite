@@ -21,7 +21,6 @@ if __name__ == "__main__":
     if len(sys.argv) != 2:
         usage()
     SITEROOT = drutils.standardize_siteroot(sys.argv[1])
-
     # Validate the SITEROOT
     if not drutils.validate_siteroot(SITEROOT):
         print "%s does not appear to be a valid Drupal site root directory" % SITEROOT
