@@ -11,7 +11,7 @@ sys.path.append(".") # this line gets replaced by `make install`
 import drutils
 
 def usage():
-    print "usage: makesite [--dbsu=USER:PASSWORD] [--version=VERSION] SITEROOT"
+    print "usage: makesite [--dbsu=USER:PASSWORD] [--version=VERSION] [--dbname=DBNAME] SITEROOT"
     drutils.common_usage();
     sys.exit(-1)
 
@@ -22,7 +22,8 @@ if __name__ == "__main__":
     DB_SU    = None
     DB_SU_PW = None
     SITEROOT = None
-    VERSION = None
+    VERSION  = None
+    DBNAME   = None
     sys.argv.pop(0)
     while True:
         if len(sys.argv)==0:
@@ -39,6 +40,12 @@ if __name__ == "__main__":
             match = re.match(r'^--version=(.+)$', arg)
             if match:
                 VERSION = match.group(1)
+            else:
+                usage()
+        if arg.startswith("--dbname"):
+            match = re.match(r'^--dbname=(.+)$', arg)
+            if match:
+                DBNAME = match.group(1)
             else:
                 usage()
         else:
@@ -71,11 +78,16 @@ if __name__ == "__main__":
         print "Site parent directory %s does not exist; please create it first." % siteparent
         sys.exit(-1)
     sitebase = os.path.basename(SITEROOT)
+    if DBNAME==None:
+        DBNAME = sitebase
+        if not re.match(r'^[a-zA-Z0-9_]+$', DBNAME):
+            print "%s is not a valid database or user name; please try again." % DBNAME
+            usage();
     #
-    # Check to make sure there is not already a database or database user named `sitebase`
+    # Check to make sure there is not already a database or database user named `DBNAME`
     #
-    if drutils.database_user_exists(sitebase, DB_SU, DB_SU_PW) or drutils.database_exists(sitebase, DB_SU, DB_SU_PW):
-        print "There is already a database and/or database user named '%s'; please choose another site name." % sitebase
+    if drutils.database_user_exists(DBNAME, DB_SU, DB_SU_PW) or drutils.database_exists(DBNAME, DB_SU, DB_SU_PW):
+        print "There is already a database and/or database user named '%s'; please choose another site name." % DBNAME
         sys.exit(-1)
     #
     # Download Drupal into the SITEROOT (this creates SITEROOT)
@@ -92,9 +104,9 @@ if __name__ == "__main__":
         SITEROOT,
         DB_SU,
         DB_SU_PW,
-        sitebase,
+        DBNAME,
         password,
-        sitebase,
+        DBNAME,
         sitebase))
     #
     # Set the site admin user password to the same as the database password:
