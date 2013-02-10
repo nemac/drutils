@@ -1,6 +1,6 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
-Version: 1.6
+Version: 1.7
 Release: 1
 License: GPL
 Group: Web Development
@@ -36,6 +36,9 @@ rm -rf %{buildroot}
 /usr/bin/dbpw
 
 %changelog
+* Sun Feb 10 2013 Mark Phillips <embeepea@git> 1.7-1
+- tweaked dbdrop (embeepea@git)
+
 * Fri Feb 08 2013 Mark Phillips <embeepea@git> 1.6-1
 - adds --dbname option to makesite; fixes #1 (embeepea@git)
 - fixes dbdrop, fixes permissions on new sites' files dir; fixes #2
