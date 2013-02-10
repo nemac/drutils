@@ -1,7 +1,7 @@
 #! /usr/bin/python
 
-# Script to drop a given MySql database and user. See README.md
-# for more details.
+# Script to drop a given MySql database and user. See 
+# README.md for more details.
 #
 # Author: Mark Phillips <mphillip@unca.edu>
 
