@@ -31,6 +31,7 @@ rm -rf %{buildroot}
 /usr/bin/dumpsite
 /usr/bin/loadsite
 /usr/bin/makesite
+/usr/bin/dbcreate
 /usr/bin/dblist
 /usr/bin/dbdrop
 /usr/bin/dbpw
