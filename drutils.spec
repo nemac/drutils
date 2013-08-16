@@ -1,7 +1,7 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
 Version: 1.8
-Release: 1
+Release: 2
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
@@ -37,6 +37,10 @@ rm -rf %{buildroot}
 /usr/bin/dbpw
 
 %changelog
+* Fri Aug 16 2013 Mark Phillips <embeepea@git> 1.8-2
+- switch to tito ReleaseTagger (embeepea@git)
+- include dbcreate in built rpm (embeepea@git)
+
 * Fri Aug 16 2013 Mark Phillips <embeepea@git> 1.8-1
 - store db passwords in /var/drutils/mysql files, add dbcreate script
   (embeepea@git)
