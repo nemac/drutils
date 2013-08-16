@@ -5,7 +5,7 @@
 #
 # Author: Mark Phillips <mphillip@unca.edu>
 
-import sys, re, os
+import sys, re, os, optparse
 sys.path.append(".") # this line gets replaced by `make install`
 import drutils
 
@@ -18,35 +18,15 @@ if __name__ == "__main__":
     #
     # Process the arguments
     #
-    DB_SU    = None
-    DB_SU_PW = None
-    NAME     = None
-    sys.argv.pop(0)
-    while True:
-        if len(sys.argv)==0:
-            break
-        arg = sys.argv.pop(0)
-        if arg.startswith("--dbsu"):
-            match = re.match(r'^--dbsu=([^:]+):(.*)$', arg)
-            if match:
-                DB_SU    = match.group(1)
-                DB_SU_PW = match.group(2)
-            else:
-                usage()
-        else:
-            if NAME==None:
-                NAME = arg
-            else:
-                usage()
-    #
-    # If we didn't get DB_SU info from the args, check for it in environment vars:
-    # 
-    if DB_SU==None:
-        try:
-            DB_SU    = os.environ['DRUTILS_DB_SU']
-            DB_SU_PW = os.environ['DRUTILS_DB_SU_PW']
-        except:
-            pass
+    parser = optparse.OptionParser()
+    drutils.add_dbsu_option(parser)
+    (opts, args) = parser.parse_args()
+    (DB_SU, DB_SU_PW) = drutils.get_dbsu(opts)
+
+    if len(args) != 1:
+        drutils.common_usage();
+        sys.exit(-1)
+    NAME = args[0]
 
     user_exists = drutils.database_user_exists(NAME, DB_SU, DB_SU_PW)
     database_exists = drutils.database_exists(NAME, DB_SU, DB_SU_PW)
@@ -75,3 +55,7 @@ if __name__ == "__main__":
             print "Nothing dropped."
     else:
         print "No database or user named '%s' found." % NAME;
+
+    cnf = "/var/drutils/mysql/%s.cnf" % NAME
+    if os.path.exists(cnf):
+        os.remove(cnf)

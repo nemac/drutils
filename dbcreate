@@ -1,0 +1,40 @@
+#! /usr/bin/python
+
+# Script to create a given MySql database and user. See 
+# README.md for more details.
+#
+# Author: Mark Phillips <mphillip@unca.edu>
+
+import sys, re, os, optparse
+sys.path.append(".") # this line gets replaced by `make install`
+import drutils
+
+def usage():
+    print "usage: dbcreate [--dbsu=USER:PASSWORD] NAME"
+    drutils.common_usage();
+    sys.exit(-1)
+
+if __name__ == "__main__":
+    #
+    # Process the arguments
+    #
+    parser = optparse.OptionParser()
+    drutils.add_dbsu_option(parser)
+    (opts, args) = parser.parse_args()
+    (DB_SU, DB_SU_PW) = drutils.get_dbsu(opts)
+
+    if len(args) != 1:
+        drutils.common_usage();
+        sys.exit(-1)
+    NAME = args[0]
+
+    if drutils.database_exists(NAME, DB_SU, DB_SU_PW):
+        print "There is already a mysql database named '%s'." % NAME
+        sys.exit(-1)
+
+    if drutils.database_user_exists(NAME, DB_SU, DB_SU_PW):
+        print "There is already a mysql user named '%s'." % NAME
+        sys.exit(-1)
+
+    drutils.create_database_and_user(NAME, DB_SU, DB_SU_PW)
+    print "database and user '%s' created." % NAME

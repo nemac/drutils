@@ -1,5 +1,5 @@
 from time import localtime, strftime
-import re, os, tarfile, random
+import re, os, tarfile, random, ConfigParser
 
 def system(command):
     #print command
@@ -107,11 +107,15 @@ def get_db_url(siteroot):
     password = find_arg(sql_connect, "password")
     return "mysql://%s:%s@%s/%s" % (user,password,host,database)
 
-def get_db_password(siteroot):
-    # Return the database password for a site, as read from its settings.php file
-    sql_connect = os.popen('drush -r %s sql-connect' % siteroot).read().strip()
-    password = find_arg(sql_connect, "password")
-    return password
+def get_db_password(name):
+    cnf = "/var/drutils/mysql/%s.cnf" % name
+    if not os.path.exists(cnf):
+        raise Exception("No password for database/user %s found." % name)
+    c = parse_ini(cnf)
+    if 'client' not in c:
+        raise Exception("No password for database/user %s found." % name)
+    return c['client']['password']
+
 
 def generate_random_password():
     random.seed()
@@ -172,6 +176,30 @@ def confirm_with_yes(prompt):
     ans = raw_input(prompt)
     return ans.lower()=="yes"
 
+def create_database_and_user(name, db_su, db_su_pw):
+    # Create a new database and user by the same same, giving that user full privs in that database
+    success = command_success(("mysqladmin --host=localhost --user=%s --password=%s create %s") % (
+            db_su,
+            db_su_pw,
+            name))
+    if not success:
+        raise Exception("database creation failed")
+    password = generate_random_password()
+    success = command_success(("mysql --database=mysql --host=localhost --user=%s --password=%s "
+                      + "-e \"grant all privileges on %s.* to '%s'@'localhost' identified by '%s'\"") % (
+            db_su,
+            db_su_pw,
+            name,name,password))
+    if not success:
+        raise Exception("user creation failed")
+    cnf = "/var/drutils/mysql/%s.cnf" % name
+    f = open(cnf, "w")
+    f.write("[client]\n")
+    f.write("user=%s\n" % name)
+    f.write("password=%s\n" % password)
+    f.close()
+    os.chmod(cnf, 0600)
+
 def drop_user(user, db_su, db_su_pw):
     # Delete the given user from MySql
     success = command_success(("mysql --database=mysql --host=localhost --user=%s --password=%s "
@@ -189,3 +217,79 @@ def drop_database(db, db_su, db_su_pw):
             db_su_pw,
             db))
     return success
+
+def parse_ini(file):
+    '''This function parses an INI-style conf file, and returns a python
+dict object containing its contents.  For example, the file
+
+   [client]
+   user=foo
+   password="bar"
+   [stuff]
+   x=3
+
+would result in the following dict object:
+
+  {
+     'client' : {
+       'user' : 'foo',
+       'password' : 'bar'
+     },
+     'stuff' : {
+       'x' : '3'
+     }
+   }
+
+This function also strips off any quotes which delimit variable values, as
+illustrated by the "password" variable in the above example.'''
+    h = {}
+    Config = ConfigParser.ConfigParser()
+    try:
+        Config.read(file)
+        for section in Config.sections():
+            if section not in h:
+                h[section] = {}
+            for option in Config.options(section):
+                val = Config.get(section, option)
+                val = re.sub(r'^"(.*)"$', '\\1', val)
+                val = re.sub(r"^'(.*)'$", '\\1', val)
+                h[section][option] = val
+    except:
+        pass
+    return h
+
+def add_dbsu_option(parser):
+    parser.add_option("--dbsu", help='optional dbsu stuff', dest="dbsu", type="string")
+
+def get_dbsu(opts):
+    # check for --dbsu command-line option, and if found, use values from it:
+    if opts.dbsu:
+        m = re.match(r'^([^:]+):(.*)$', opts['dbsu'])
+        if m:
+            DB_SU    = m.group(1)
+            DB_SU_PW = m.group(2)
+            return (DB_SU, DB_SU_PW)
+        return (None,None)
+
+    #
+    # If we didn't get DB_SU info from the args, check for it in environment vars:
+    # 
+    if ("DRUTILS_DB_SU" in os.environ) and ('DRUTILS_DB_SU_PW' in os.environ):
+        DB_SU    = os.environ['DRUTILS_DB_SU']
+        DB_SU_PW = os.environ['DRUTILS_DB_SU_PW']
+        return (DB_SU, DB_SU_PW)
+
+    #
+    # If we still don't have DB_SU, try to read it from /root/.my.cnf; this will
+    # work only if the user running this script has permission to read that file.
+    # 
+    try:
+        cfg = parse_ini("/root/.my.cnf")
+        if 'client' in cfg:
+            DB_SU    = cfg['client']['user']
+            DB_SU_PW = cfg['client']['password']
+            return (DB_SU, DB_SU_PW)
+    except:
+        pass
+
+    return (None,None)
