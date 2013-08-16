@@ -1,6 +1,6 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
-Version: 1.7
+Version: 1.8
 Release: 1
 License: GPL
 Group: Web Development
@@ -36,6 +36,10 @@ rm -rf %{buildroot}
 /usr/bin/dbpw
 
 %changelog
+* Fri Aug 16 2013 Mark Phillips <embeepea@git> 1.8-1
+- store db passwords in /var/drutils/mysql files, add dbcreate script
+  (embeepea@git)
+
 * Sun Feb 10 2013 Mark Phillips <embeepea@git> 1.7-1
 - tweaked dbdrop (embeepea@git)
 
