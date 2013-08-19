@@ -21,7 +21,8 @@ drush commands.
 
 %install
 rm -rf %{buildroot}
-make prefix=%{buildroot}/usr dest_prefix=/usr install
+echo make root=%{buildroot}/ prefix=%{buildroot}/usr dest_prefix=/usr install
+make root=%{buildroot}/ prefix=%{buildroot}/usr dest_prefix=/usr install
 
 %clean
 rm -rf %{buildroot}
