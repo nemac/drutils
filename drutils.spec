@@ -1,7 +1,7 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
 Version: 1.8
-Release: 2
+Release: 3
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
@@ -39,6 +39,12 @@ rm -rf %{buildroot}
 %dir /var/drutils/mysql
 
 %changelog
+* Mon Aug 19 2013 Unknown name 1.8-3
+- change perms of  /var/drutils/mysql on installation (embeepea@git)
+- pass root var from spec file to Makefile (vagrant@server.(none))
+- `make install` now creates dir /var/drutils/mysql (vagrant@server.(none))
+- add /var/drutils/mysql dir to rpm spec file (vagrant@server.(none))
+
 * Fri Aug 16 2013 Mark Phillips <embeepea@git> 1.8-2
 - switch to tito ReleaseTagger (embeepea@git)
 - include dbcreate in built rpm (embeepea@git)
