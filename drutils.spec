@@ -1,7 +1,7 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
 Version: 1.9
-Release: 2
+Release: 3
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
@@ -39,6 +39,12 @@ rm -rf %{buildroot}
 %dir /var/drutils/mysql
 
 %changelog
+* Mon Aug 19 2013 Mark Phillips <embeepea@git> 1.9-3
+- add .vagrant dir to .gitignore (embeepea@git)
+- adds file puppet/modules/README.md (embeepea@git)
+- adds Vagrantfile and puppet manifests for virtual rpm build environment
+  (embeepea@git)
+
 * Mon Aug 19 2013 Mark Phillips <embeepea@git> 1.9-2
 - add script for updating yum repo (embeepea@git)
 
