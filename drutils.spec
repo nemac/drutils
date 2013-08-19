@@ -1,7 +1,7 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
-Version: 1.8
-Release: 2
+Version: 1.9
+Release: 0
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
