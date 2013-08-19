@@ -20,3 +20,4 @@ install:
 	${EDIT_LIB_DIR} < dbdrop > dbdrop.edited ; install -D -m 0755 dbdrop.edited ${bindir}/dbdrop ; /bin/rm -f dbdrop.edited
 	${EDIT_LIB_DIR} < dbpw > dbpw.edited ; install -D -m 0755 dbpw.edited ${bindir}/dbpw ; /bin/rm -f dbpw.edited
 	mkdir -p ${root}var/drutils/mysql
+	chmod g=,o= ${root}var/drutils/mysql
