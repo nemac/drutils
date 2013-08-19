@@ -1,7 +1,7 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
 Version: 1.9
-Release: 0
+Release: 1
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
@@ -39,6 +39,17 @@ rm -rf %{buildroot}
 %dir /var/drutils/mysql
 
 %changelog
+* Mon Aug 19 2013 Mark Phillips <embeepea@git> 1.9-1
+- fix version metadata (embeepea@git)
+- bump version to 1.9 (embeepea@git)
+- fix version number (embeepea@git)
+- Automatic commit of package [drutils] minor release [1.8-3].
+  (vagrant@server.(none))
+- change perms of  /var/drutils/mysql on installation (embeepea@git)
+- pass root var from spec file to Makefile (vagrant@server.(none))
+- `make install` now creates dir /var/drutils/mysql (vagrant@server.(none))
+- add /var/drutils/mysql dir to rpm spec file (vagrant@server.(none))
+
 * Mon Aug 19 2013 Unknown name 1.8-2
 - change perms of  /var/drutils/mysql on installation (embeepea@git)
 - pass root var from spec file to Makefile (vagrant@server.(none))
