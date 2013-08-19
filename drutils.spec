@@ -1,7 +1,7 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
 Version: 1.9
-Release: 1
+Release: 2
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
@@ -39,6 +39,9 @@ rm -rf %{buildroot}
 %dir /var/drutils/mysql
 
 %changelog
+* Mon Aug 19 2013 Mark Phillips <embeepea@git> 1.9-2
+- add script for updating yum repo (embeepea@git)
+
 * Mon Aug 19 2013 Mark Phillips <embeepea@git> 1.9-1
 - fix version metadata (embeepea@git)
 - bump version to 1.9 (embeepea@git)
