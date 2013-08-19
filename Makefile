@@ -18,3 +18,4 @@ install:
 	${EDIT_LIB_DIR} < dblist > dblist.edited ; install -D -m 0755 dblist.edited ${bindir}/dblist ; /bin/rm -f dblist.edited
 	${EDIT_LIB_DIR} < dbdrop > dbdrop.edited ; install -D -m 0755 dbdrop.edited ${bindir}/dbdrop ; /bin/rm -f dbdrop.edited
 	${EDIT_LIB_DIR} < dbpw > dbpw.edited ; install -D -m 0755 dbpw.edited ${bindir}/dbpw ; /bin/rm -f dbpw.edited
+	mkdir -p /var/drutils/mysql
