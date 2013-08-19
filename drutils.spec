@@ -35,6 +35,7 @@ rm -rf %{buildroot}
 /usr/bin/dblist
 /usr/bin/dbdrop
 /usr/bin/dbpw
+%dir /var/drutils/mysql
 
 %changelog
 * Fri Aug 16 2013 Mark Phillips <embeepea@git> 1.8-2
