@@ -261,9 +261,9 @@ illustrated by the "password" variable in the above example.'''
 def add_dbsu_option(parser):
     parser.add_option("--dbsu", help='optional dbsu stuff', dest="dbsu", type="string")
 
-def get_dbsu(opts):
+def get_dbsu(opts=None):
     # check for --dbsu command-line option, and if found, use values from it:
-    if opts.dbsu:
+    if opts and opts.dbsu:
         m = re.match(r'^([^:]+):(.*)$', opts['dbsu'])
         if m:
             DB_SU    = m.group(1)
