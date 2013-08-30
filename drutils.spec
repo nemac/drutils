@@ -1,7 +1,7 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
 Version: 1.9
-Release: 4
+Release: 5
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
@@ -51,6 +51,11 @@ rm -rf %{buildroot}
 %dir /var/nappl
 
 %changelog
+* Fri Aug 30 2013 Mark Phillips <embeepea@git> 1.9-5
+- more fixes related to nappl group (embeepea@git)
+- create nappl group, give it permissions on /var/nappl (embeepea@git)
+- adds nappl (embeepea@git)
+
 * Tue Aug 27 2013 Mark Phillips <embeepea@git> 1.9-4
 - make opts arg to get_dbsu() function optional (embeepea@git)
 
