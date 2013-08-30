@@ -1,7 +1,7 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
 Version: 1.9
-Release: 6
+Release: 7
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
@@ -53,6 +53,10 @@ rm -rf %{buildroot}
 %dir /var/nappl
 
 %changelog
+* Fri Aug 30 2013 Mark Phillips <embeepea@git> 1.9-7
+- make /var/drutils accessible to nappl group (embeepea@git)
+- look for .my.cnf in ~/.my.cnf, rather than /root/.my.cnf (embeepea@git)
+
 * Fri Aug 30 2013 Mark Phillips <embeepea@git> 1.9-6
 - fix another path issue (embeepea@git)
 - fix rpm postun typo, load path issues (vagrant@server.uncanet.unca.edu)
