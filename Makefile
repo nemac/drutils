@@ -24,4 +24,5 @@ install:
 	mkdir -p ${root}var/drutils/mysql
 	chmod g=,o= ${root}var/drutils/mysql
 	mkdir -p ${root}var/nappl
-	chmod g=,o= ${root}var/nappl
+	chown root.nappl ${root}var/nappl
+	chmod g=rwxs,o= ${root}var/nappl

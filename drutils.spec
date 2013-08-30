@@ -19,10 +19,16 @@ drush commands.
 
 %build
 
+%pre
+/usr/bin/getent group nappl || /usr/sbin/groupadd -r nappl
+
 %install
 rm -rf %{buildroot}
 echo make root=%{buildroot}/ prefix=%{buildroot}/usr dest_prefix=/usr install
 make root=%{buildroot}/ prefix=%{buildroot}/usr dest_prefix=/usr install
+
+%postun
+/usr/sbin/userdel nappl
 
 %clean
 rm -rf %{buildroot}
