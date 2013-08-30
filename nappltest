@@ -1,0 +1,214 @@
+#! /usr/bin/python
+
+import os
+os.environ['DRUSH_DL_COMMAND'] = "tar xfz %s/drupal-7.23.tgz ; mv drupal-7.23 html" % os.getcwd()
+os.environ['DRUSH_SITE_INSTALL_COMMAND'] = "touch sites/default/settings.php"
+
+import nappl, unittest, sys, shutil
+
+sys.path.append("/usr/lib/drutils")
+import drutils
+
+APPNAME         = "foobar.nemac.org"
+DBNAME          = "foobar"
+EXPLICIT_DBNAME = "neenee"
+
+def cleanup(appname=None, dbname=None):
+    if dbname is not None:
+        # delete database & user
+        (DB_SU, DB_SU_PW) = drutils.get_dbsu()
+        if drutils.database_exists(dbname, DB_SU, DB_SU_PW):
+            drutils.drop_database(dbname, DB_SU, DB_SU_PW)
+        if drutils.database_user_exists(dbname, DB_SU, DB_SU_PW):
+            drutils.drop_user(dbname,  DB_SU, DB_SU_PW)
+        # delete drutils mysql cnf file
+        drutils_cnf_file = "/var/drutils/mysql/%s.cnf" % dbname
+        if os.path.exists(drutils_cnf_file):
+            os.remove(drutils_cnf_file)
+    if appname is not None:
+        # delete vsites mysql credentials files
+        vsites_mysql_cred_dir = "/var/vsites/mysql/%s" % appname
+        if os.path.exists(vsites_mysql_cred_dir):
+            shutil.rmtree(vsites_mysql_cred_dir)
+        # delete nappl metadata dir
+        nappl_metadata_dir = "/var/nappl/%s" % appname
+        if os.path.exists(nappl_metadata_dir):
+            shutil.rmtree(nappl_metadata_dir)
+        # delete the vsites dir
+        vsitesdir = "/var/vsites/%s" % APPNAME
+        if os.path.exists(vsitesdir):
+            shutil.rmtree(vsitesdir)
+        # delete the apache conf symlink
+        apacheconf_symlink = "/var/vsites/conf/%s.conf" % APPNAME
+        if os.path.exists(apacheconf_symlink):
+            os.remove(apacheconf_symlink)
+        # remove app name from /etc/hosts
+        nappl.EtcHoster(appname).remove_lines()
+
+class TestFunctions(unittest.TestCase):
+
+    def setUp(self):
+        cleanup(appname=APPNAME, dbname=DBNAME)
+
+    def test_infer_database_name(self):
+        dbname = nappl.infer_database_name(APPNAME)
+        self.assertEqual(dbname, DBNAME)
+
+    def test_create_delete_database(self):
+        (DB_SU, DB_SU_PW) = drutils.get_dbsu()
+        nappl.create_database(DBNAME)
+        self.assertTrue(drutils.database_exists(DBNAME, DB_SU, DB_SU_PW))
+        self.assertTrue(drutils.database_user_exists(DBNAME, DB_SU, DB_SU_PW))
+        drutils.drop_user(DBNAME,  DB_SU, DB_SU_PW)
+        drutils.drop_database(DBNAME,  DB_SU, DB_SU_PW)
+        self.assertFalse(drutils.database_exists(DBNAME, DB_SU, DB_SU_PW))
+        self.assertFalse(drutils.database_user_exists(DBNAME, DB_SU, DB_SU_PW))
+
+    def test_create_duplicate_database(self):
+        (DB_SU, DB_SU_PW) = drutils.get_dbsu()
+        nappl.create_database(DBNAME)
+        self.assertTrue(drutils.database_exists(DBNAME, DB_SU, DB_SU_PW))
+        self.assertTrue(drutils.database_user_exists(DBNAME, DB_SU, DB_SU_PW))
+        self.assertRaises(nappl.DatabaseError, nappl.create_database, DBNAME)
+        drutils.drop_database(DBNAME,  DB_SU, DB_SU_PW)
+        self.assertRaises(nappl.DatabaseError, nappl.create_database, DBNAME)
+        drutils.drop_user(DBNAME,  DB_SU, DB_SU_PW)
+
+class TestNapplMeta(unittest.TestCase):
+
+    def setUp(self):
+        cleanup(appname=APPNAME, dbname=DBNAME)
+
+    def test_basic(self):
+        m = nappl.NapplMeta(APPNAME)
+        m.data = {
+            'section1' : {
+                'name' : 'fred',
+                'color' : 'white'
+            },
+            'section2' : {
+                'time' : 'a',
+                'space' : 'b'
+            }
+        }
+        m.save()
+        m = nappl.NapplMeta(APPNAME)
+        m.load()
+        self.assertEqual(m.data['section1']['name'], 'fred')
+        self.assertEqual(m.data['section1']['color'], 'white')
+        self.assertEqual(m.data['section2']['time'], 'a')
+        self.assertEqual(m.data['section2']['space'], 'b')
+        shutil.rmtree("/var/nappl/%s" % APPNAME)
+
+class TestDrupalContainer(unittest.TestCase):
+
+    def setUp(self):
+        cleanup(appname=APPNAME, dbname=DBNAME)
+
+    def test_constructor(self):
+        c = nappl.DrupalContainer(APPNAME)
+        self.assertTrue(isinstance(c, nappl.DrupalContainer))
+        self.assertEqual(c.appName, APPNAME)
+
+    def verify_creation(self, APPNAME, DBNAME):
+        # nappl metadata file
+        self.assertTrue(os.path.exists("/var/nappl/%s/metadata.json" % APPNAME),
+                         msg="Application metadata.json file does not exist")
+        # mysql credentials files
+        d7file = "/var/vsites/mysql/%s/d7.php" % APPNAME
+        self.assertTrue(os.path.exists(d7file),
+                         msg="Mysql credentials file %s not created" % d7file)
+        d6file = "/var/vsites/mysql/%s/d6.php" % APPNAME
+        self.assertTrue(os.path.exists(d6file),
+                         msg="Mysql credentials file %s not created" % d6file)
+        # mysql database/user
+        (DB_SU, DB_SU_PW) = drutils.get_dbsu()
+        self.assertTrue(drutils.database_exists(DBNAME, DB_SU, DB_SU_PW),
+                        msg="Mysql database %s not created" % DBNAME)
+        self.assertTrue(drutils.database_user_exists(DBNAME, DB_SU, DB_SU_PW),
+                        msg="Mysql user %s not created" % DBNAME)
+        # drutils mysql cnf file
+        drutils_cnf_file = "/var/drutils/mysql/%s.cnf" % DBNAME
+        self.assertTrue(os.path.exists(drutils_cnf_file),
+                        msg="Drutils mysql cnf file %s not created" % drutils_cnf_file)
+
+    def test_create(self):
+        c = nappl.DrupalContainer(APPNAME)
+        c.create()
+        self.verify_creation(APPNAME, DBNAME)
+
+    def test_delete(self):
+        c = nappl.DrupalContainer(APPNAME)
+        c.create()
+        self.verify_creation(APPNAME, DBNAME)
+        c.delete()
+        # nappl metadata file
+        dir = "/var/nappl/%s" % APPNAME
+        self.assertFalse(os.path.exists(dir),
+                         msg="Application metadata dir %s not deleted" % dir)
+        # mysql credentials files
+        dir = "/var/vsites/mysql/%s" % APPNAME
+        self.assertFalse(os.path.exists(dir),
+                         msg="Mysql credentials dir %s not deleted" % dir)
+        # mysql database/user
+        (DB_SU, DB_SU_PW) = drutils.get_dbsu()
+        self.assertFalse(drutils.database_exists(DBNAME, DB_SU, DB_SU_PW),
+                        msg="Mysql database %s not deleted" % DBNAME)
+        self.assertFalse(drutils.database_user_exists(DBNAME, DB_SU, DB_SU_PW),
+                        msg="Mysql user %s not deleted" % DBNAME)
+        # drutils mysql cnf file
+        drutils_cnf_file = "/var/drutils/mysql/%s.cnf" % DBNAME
+        self.assertFalse(os.path.exists(drutils_cnf_file),
+                        msg="Drutils mysql cnf file %s not deleted" % drutils_cnf_file)
+        # vsites dir
+        vsitesdir = "/var/vsites/%s" % APPNAME
+        self.assertFalse(os.path.exists(vsitesdir),
+                        msg="Vsites dir %s not deleted" % vsitesdir)
+        # apache conf symlink
+        apacheconf_symlink = "/var/vsites/conf/%s.conf" % APPNAME
+        self.assertFalse(os.path.exists(apacheconf_symlink),
+                        msg="Apache conf file symlink %s not deleted" % apacheconf_symlink)
+
+        
+    def test_init(self):
+        c = nappl.DrupalContainer(APPNAME)
+        c.create()
+        self.verify_creation(APPNAME, DBNAME)
+        c.init()
+        # vsites dir
+        vsitesdir = "/var/vsites/%s" % APPNAME
+        self.assertTrue(os.path.exists(vsitesdir),
+                        msg="Vsites dir %s not created" % vsitesdir)
+        # apache conf file (site.conf in vsitesdir)
+        apacheconf = "%s/site.conf" % vsitesdir
+        self.assertTrue(os.path.exists(apacheconf),
+                        msg="Apache conf file %s not created" % apacheconf)
+        # apache conf symlink
+        apacheconf_symlink = "/var/vsites/conf/%s.conf" % APPNAME
+        self.assertTrue(os.path.exists(apacheconf_symlink),
+                        msg="Apache conf file symlink %s not created" % apacheconf_symlink)
+        # drupal itself in 'html' subdir of vsitesdir
+        htmldir = "%s/html" % vsitesdir
+        self.assertTrue(os.path.exists(htmldir),
+                        msg="Html dir %s not created" % htmldir)
+        indexphp = "%s/index.php" % htmldir
+        self.assertTrue(os.path.exists(indexphp),
+                        msg="Drupal not present in html dir %s (missing 'index.php' file)" % htmldir)
+        sitesdir = "%s/sites" % htmldir
+        self.assertTrue(os.path.exists(sitesdir),
+                        msg="Drupal not present in html dir %s (missing 'sites' subdir)" % htmldir)
+        settingsphp = "%s/sites/default/settings.php" % htmldir
+        self.assertTrue(os.path.exists(settingsphp),
+                        msg="sites/default/settings.php not present in html dir %s" % htmldir)
+        # .gitignore file in vsitesdir
+        gitignore = "%s/.gitignore" % vsitesdir
+        self.assertTrue(os.path.exists(gitignore),
+                        msg=".gitignore not present in vsitesdir %s" % vsitesdir)
+        # .git dir in vsitesdir
+        gitdir = "%s/.git" % vsitesdir
+        self.assertTrue(os.path.exists(gitdir),
+                        msg=".git directory not present in vsitesdir %s" % vsitesdir)
+
+if __name__ == '__main__':
+    unittest.main()
+    cleanup(appname=APPNAME, dbname=DBNAME)

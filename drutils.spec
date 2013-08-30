@@ -28,7 +28,7 @@ make root=%{buildroot}/ prefix=%{buildroot}/usr dest_prefix=/usr install
 rm -rf %{buildroot}
 
 %files
-/usr/lib/drutils/drutils.py*
+/usr/lib/drutils/*.py*
 /usr/bin/dumpsite
 /usr/bin/loadsite
 /usr/bin/makesite
@@ -36,7 +36,9 @@ rm -rf %{buildroot}
 /usr/bin/dblist
 /usr/bin/dbdrop
 /usr/bin/dbpw
+/usr/bin/nappl
 %dir /var/drutils/mysql
+%dir /var/nappl
 
 %changelog
 * Tue Aug 27 2013 Mark Phillips <embeepea@git> 1.9-4

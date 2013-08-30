@@ -19,5 +19,9 @@ install:
 	${EDIT_LIB_DIR} < dblist > dblist.edited ; install -D -m 0755 dblist.edited ${bindir}/dblist ; /bin/rm -f dblist.edited
 	${EDIT_LIB_DIR} < dbdrop > dbdrop.edited ; install -D -m 0755 dbdrop.edited ${bindir}/dbdrop ; /bin/rm -f dbdrop.edited
 	${EDIT_LIB_DIR} < dbpw > dbpw.edited ; install -D -m 0755 dbpw.edited ${bindir}/dbpw ; /bin/rm -f dbpw.edited
+	install -D nappl.py ${libdir}/nappl.py
+	${EDIT_LIB_DIR} < nappl > nappl.edited ; install -D -m 0755 nappl.edited ${bindir}/nappl ; /bin/rm -f nappl.edited
 	mkdir -p ${root}var/drutils/mysql
 	chmod g=,o= ${root}var/drutils/mysql
+	mkdir -p ${root}var/nappl
+	chmod g=,o= ${root}var/nappl
