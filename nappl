@@ -1,8 +1,9 @@
 #! /usr/bin/python
 
+import sys
 sys.path.append(".") # this line gets replaced by `make install`
 
-import nappl, sys, re, os, optparse, shutil, json
+import nappl, re, os, optparse, shutil, json
 
 if __name__ == "__main__":
     #
