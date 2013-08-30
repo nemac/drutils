@@ -1,9 +1,6 @@
 #! /usr/bin/python
 
-import sys, re, os, optparse, shutil, json
-
-sys.path.append("/usr/lib/drutils")
-import drutils
+import sys, re, os, optparse, shutil, json, drutils
 
 # The following is in support of running unit tests, to allow them to run without
 # incurring the wait associated with actually downloading drupal.  The DRUSH_DL_COMMAND
