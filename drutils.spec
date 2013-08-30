@@ -25,6 +25,8 @@ drush commands.
 %post
 /bin/chgrp nappl /var/nappl
 /bin/chmod g=rwsx /var/nappl
+/bin/chgrp nappl /var/drutils /var/drutils/mysql
+/bin/chmod g=rwsx /var/drutils /var/drutils/mysql
 
 %install
 rm -rf %{buildroot}
