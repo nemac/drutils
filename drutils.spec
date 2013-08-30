@@ -22,6 +22,10 @@ drush commands.
 %pre
 /usr/bin/getent group nappl || /usr/sbin/groupadd -r nappl
 
+%post
+/bin/chgrp nappl /var/nappl
+/bin/chmod g=rwsx /var/nappl
+
 %install
 rm -rf %{buildroot}
 echo make root=%{buildroot}/ prefix=%{buildroot}/usr dest_prefix=/usr install
