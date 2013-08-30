@@ -280,15 +280,16 @@ def get_dbsu(opts=None):
         return (DB_SU, DB_SU_PW)
 
     #
-    # If we still don't have DB_SU, try to read it from /root/.my.cnf; this will
-    # work only if the user running this script has permission to read that file.
+    # If we still don't have DB_SU, try to read it from ~/.my.cnf, if that file exists
     # 
     try:
-        cfg = parse_ini("/root/.my.cnf")
-        if 'client' in cfg:
-            DB_SU    = cfg['client']['user']
-            DB_SU_PW = cfg['client']['password']
-            return (DB_SU, DB_SU_PW)
+        mycnf = "%s/.my.cnf" % os.environ['HOME']
+        if os.path.exists(mycnf):
+            cfg = parse_ini(mycnf)
+            if 'client' in cfg:
+                DB_SU    = cfg['client']['user']
+                DB_SU_PW = cfg['client']['password']
+                return (DB_SU, DB_SU_PW)
     except:
         pass
 
