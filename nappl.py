@@ -58,10 +58,18 @@ def edit_drupal_settingsphp(vsitesdir, appname):
         elif d7 and re.search(r"'password'\s*=>\s*", line):
             line = "      'password' => '',"
         newcontents.append(line)
+    settingsphp_was_writable = True
+    if not os.access(settingsphp, os.W_OK):
+        os.system("chmod u+w %s" % settingsphp)
+        settingsphp_was_writable = False
+    if not os.access(settingsphp, os.W_OK):
+        raise Exception("Unable to modify drupal's settings.php file %s" % settingsphp)
     with open(settingsphp, "w") as f:
         f.write("\n".join(newcontents) + "\n")
         if d7:
-            f.write("\nrequire_once DRUPAL_ROOT . '/../../mysql/foobar.nemac.org/d7.php';\n")
+            f.write("\nrequire_once DRUPAL_ROOT . '/../../mysql/%s/d7.php';\n" % appname)
+    if not settingsphp_was_writable:
+        os.system("chmod u-w %s" % settingsphp)
 
 def edit_drupal_gitignore(vsitesdir):
     gitignore = "%s/html/.gitignore" % vsitesdir
@@ -79,6 +87,11 @@ def edit_drupal_gitignore(vsitesdir):
     if changed:
         with open(gitignore, "w") as f:
             f.write("\n".join(newcontents) + "\n")
+
+def rmtree(path):
+    if os.path.exists(path):
+        os.system("chmod -R u+w %s" % path)
+        shutil.rmtree(path)
 
 
 class EtcHoster:
@@ -263,20 +276,20 @@ class DrupalContainer(Container):
             os.remove(drutils_mysql_cnf)
         # delete the mysql credentials files
         mysql_credentials_dir = "/var/vsites/mysql/%s" % self.appName
-        shutil.rmtree(mysql_credentials_dir)
-        # delete the nappl metadata dir
-        meta = NapplMeta(self.appName)
-        if os.path.exists(meta.dir):
-            shutil.rmtree(meta.dir)
+        rmtree(mysql_credentials_dir)
         # delete the vsites dir for the app
         vsitesdir = "/var/vsites/%s" % self.appName
         if os.path.exists(vsitesdir):
-            shutil.rmtree(vsitesdir)
+            rmtree(vsitesdir)
         # delete the apache conf symlink
         apacheconf_symlink = "/var/vsites/conf/%s.conf" % self.appName
         if os.path.exists(apacheconf_symlink):
             os.remove(apacheconf_symlink)
         EtcHoster(self.appName).remove_lines()
+        # delete the nappl metadata dir
+        meta = NapplMeta(self.appName)
+        if os.path.exists(meta.dir):
+            rmtree(meta.dir)
 
         #print "Container for app %s deleted" % self.appName
 
