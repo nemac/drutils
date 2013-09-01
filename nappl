@@ -39,6 +39,9 @@ if __name__ == "__main__":
     parser.add_option('--db-dump',
                       help='make a database dump file of the application',
                       dest='dbDump', default=False, action='store_true')
+    parser.add_option('--db-load',
+                      help='load a database dump file into the container',
+                      dest='dbLoad', type='string')
     (opts, args) = parser.parse_args()
 
 
@@ -67,6 +70,11 @@ if __name__ == "__main__":
                 print "No dump created."
                 sys.exit(0)
         c.dbdump()
+
+    elif opts.dbLoad:
+        appName = args[0]
+        c = nappl.Container.load(appName)
+        c.dbload(opts.dbLoad)
 
     elif opts.listContainers:
         apps = nappl.Container.list_containers()

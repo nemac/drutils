@@ -91,10 +91,10 @@ def edit_drupal_gitignore(vsitesdir):
     newcontents = []
     changed = False
     for line in [x.strip("\n") for x in contents]:
-        if re.match(r'settings\.php', line):
+        if re.match(r'^sites/\*/settings\*.php$', line):
             line = '#' + line
             changed = True
-    newcontents.append(line)
+        newcontents.append(line)
     if changed:
         with open(gitignore, "w") as f:
             f.write("\n".join(newcontents) + "\n")
@@ -358,6 +358,8 @@ class DrupalContainer(Container):
                   % (vsitesdir, drush_site_install_command(self.appName, dbname, dbpassword)))
         # edit the new drupal's settings.php file to point to the container's mysql credentials file
         edit_drupal_settingsphp(vsitesdir, self.appName)
+        # edit the new drupal's .gitignore file so that it will allow settings.php in git repo
+        edit_drupal_gitignore(vsitesdir)
         # initialize a git repo for the application
         with open("%s/.gitignore" % vsitesdir, "w") as f:
             f.write("*~\n")
@@ -382,8 +384,7 @@ class DrupalContainer(Container):
         return git_wd_clean(vsitesdir)
 
     def dbdump(self):
-        """Write a compressed database dump file for the application into the current directory."""
-        # 'git rev-parse --short HEAD' will print current commit sha
+        """Write a compressed sql dump file for the application into the current directory."""
         vsitesdir = "/var/vsites/%s" % self.appName
         sha = bash_command("cd %s ; git rev-parse --short HEAD" % vsitesdir)
         if not self.git_wd_clean():
@@ -393,3 +394,8 @@ class DrupalContainer(Container):
         os.system("drush -r %s/html sql-dump | gzip > %s" % (vsitesdir, dumpfile))
         print "wrote %s" % dumpfile
 
+    def dbload(self, dumpfile):
+        """Load a compressed sql dump file into the database for this container."""
+        # 'git rev-parse --short HEAD' will print current commit sha
+        vsitesdir = "/var/vsites/%s" % self.appName
+        os.system("gunzip < %s | drush -r %s/html sqlc" % (dumpfile, vsitesdir))
