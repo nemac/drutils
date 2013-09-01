@@ -40,7 +40,7 @@ def cleanup(appname=None, dbname=None):
             shutil.rmtree(vsitesdir)
         # delete the apache conf symlink
         apacheconf_symlink = "/var/vsites/conf/%s.conf" % APPNAME
-        if os.path.exists(apacheconf_symlink):
+        if os.path.lexists(apacheconf_symlink):
             os.remove(apacheconf_symlink)
         # remove app name from /etc/hosts
         nappl.EtcHoster(appname).remove_lines()

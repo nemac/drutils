@@ -310,7 +310,7 @@ class DrupalContainer(Container):
             rmtree(vsitesdir)
         # delete the apache conf symlink
         apacheconf_symlink = "/var/vsites/conf/%s.conf" % self.appName
-        if os.path.exists(apacheconf_symlink):
+        if os.path.lexists(apacheconf_symlink):
             os.remove(apacheconf_symlink)
         EtcHoster(self.appName).remove_lines()
         # delete the nappl metadata dir
@@ -373,7 +373,7 @@ class DrupalContainer(Container):
         if not os.path.exists(apacheconf):
             raise Exception("Apache conf file %s not found" % apacheconf)
         apacheconf_symlink = "/var/vsites/conf/%s.conf" % self.appName
-        if os.path.exists(apacheconf_symlink):
+        if os.path.lexists(apacheconf_symlink):
             os.remove(apacheconf_symlink)
         os.symlink(apacheconf, apacheconf_symlink)
 
