@@ -76,6 +76,11 @@ if __name__ == "__main__":
         c = nappl.Container.load(appName)
         c.dbload(opts.dbLoad)
 
+    elif opts.install:
+        appName = args[0]
+        c = nappl.Container.load(appName)
+        c.install()
+
     elif opts.listContainers:
         apps = nappl.Container.list_containers()
         format = "%-40s  %-10s  %-10s  %s"
