@@ -1,6 +1,11 @@
 #! /usr/bin/python
 
-import sys, re, os, optparse, shutil, json, drutils
+import sys, re, os, optparse, shutil, json, drutils, subprocess, time
+
+def bash_command(command):
+    """Run command in a bash subshell, and return its output as a string"""
+    return subprocess.Popen(['/bin/bash', '-c', command],
+                            stdout=subprocess.PIPE).communicate()[0].strip()
 
 # The following is in support of running unit tests, to allow them to run without
 # incurring the wait associated with actually downloading drupal.  The DRUSH_DL_COMMAND
@@ -70,6 +75,12 @@ def edit_drupal_settingsphp(vsitesdir, appname):
             f.write("\nrequire_once DRUPAL_ROOT . '/../../mysql/%s/d7.php';\n" % appname)
     if not settingsphp_was_writable:
         os.system("chmod u-w %s" % settingsphp)
+
+def git_wd_clean(dir):
+    """Return True iff there are no outstanding edits in DIR since the most recent git commit."""
+    if re.search(r'working directory clean', bash_command("cd %s ; git status" % dir)):
+        return True
+    return False
 
 def edit_drupal_gitignore(vsitesdir):
     gitignore = "%s/html/.gitignore" % vsitesdir
@@ -161,6 +172,22 @@ class NapplMeta:
 class Container:
     def __init__(self, appName):
         self.appName = appName
+        self.meta = None
+
+    @staticmethod
+    def load(appName):
+        """Return an instance of a Container object corresponding to an container.  The
+        returned object will have a 'meta' property which has been pre-loaded with 
+        a NapplMeta object containing the container metadata."""
+        meta = NapplMeta(appName)
+        if not os.path.exists(meta.datafile):
+            raise Exception("Container not found.")
+        meta.load()
+        if meta.data['application']['type'] == "drupal":
+            container = DrupalContainer(appName)
+            container.meta = meta
+            return container
+        raise Exception("Unknown container type '%s'" % meta.data['application']['type'])
 
     @staticmethod
     def list_containers():
@@ -347,3 +374,22 @@ class DrupalContainer(Container):
         if os.path.exists(apacheconf_symlink):
             os.remove(apacheconf_symlink)
         os.symlink(apacheconf, apacheconf_symlink)
+
+    def git_wd_clean(self):
+        """Return True iff the application in this container has no outstanding edits since
+        the last git commit."""
+        vsitesdir = "/var/vsites/%s" % self.appName
+        return git_wd_clean(vsitesdir)
+
+    def dbdump(self):
+        """Write a compressed database dump file for the application into the current directory."""
+        # 'git rev-parse --short HEAD' will print current commit sha
+        vsitesdir = "/var/vsites/%s" % self.appName
+        sha = bash_command("cd %s ; git rev-parse --short HEAD" % vsitesdir)
+        if not self.git_wd_clean():
+            sha = sha + "--edited"
+        timestamp = time.strftime("%Y-%m-%d--%H-%M-%S", time.localtime())
+        dumpfile = "%s--%s--%s.sql.gz" % (self.appName, sha, timestamp)
+        os.system("drush -r %s/html sql-dump | gzip > %s" % (vsitesdir, dumpfile))
+        print "wrote %s" % dumpfile
+
