@@ -32,6 +32,11 @@ class DrupalContainer(ApacheContainer):
         #
         super(DrupalContainer, self).create()
         #
+        # Change the application type to 'drupal'
+        #
+        self.meta.data['application']['type'] = 'drupal'
+        self.meta.save()
+        #
         # create the mysql database
         #
         if dbname is None:
