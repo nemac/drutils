@@ -21,7 +21,7 @@ drush commands.
 
 %pre
 /usr/bin/getent group nappl || /usr/sbin/groupadd -r nappl
-/usr/bin/getent user git || /usr/sbin/useradd -r -m -U git
+/usr/bin/getent passwd git  || /usr/sbin/useradd -r -m -U git
 
 %post
 /bin/chgrp nappl /var/nappl
