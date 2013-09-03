@@ -60,6 +60,9 @@ rm -rf %{buildroot}
 /usr/bin/nappl
 %dir /var/drutils/mysql
 %dir /var/nappl
+%dir /var/vsites
+%dir /var/vsites/conf
+%dir /var/vsites/mysql
 %dir /deploy
 
 %changelog
