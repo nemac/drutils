@@ -14,11 +14,11 @@ Vagrant.configure("2") do |config|
 
   # Use shell provisioner to install puppet yum repo, puppet, epel repo:
   config.vm.provision :shell, :inline => <<-HEREDOC
-    rpm -Uvh http://yum.puppetlabs.com/el/6/products/i386/puppetlabs-release-6-7.noarch.rpm
-    yum -y install puppet
-    rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+    if test ! -f /usr/bin/puppet ; then rpm -Uvh http://yum.puppetlabs.com/el/6/products/i386/puppetlabs-release-6-7.noarch.rpm ; yum -y install puppet ; fi
+    if test ! -f /etc/yum.repos.d/epel.repo ; then rpm -Uvh http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm ; fi
     exit 0
   HEREDOC
+
 
   # use puppet provisioner to install everything else (see details in puppet/site.pp)
   config.vm.provision :puppet,

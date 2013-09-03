@@ -2,6 +2,16 @@ package { 'emacs-nox':
   ensure => installed
 }
 
+exec { 'set-hostname':
+    command => '/bin/sed -i "s/HOSTNAME=.*/HOSTNAME=drutils-dev/" /etc/sysconfig/network',
+    unless  => '/bin/grep -q "HOSTNAME=drutils-dev" /etc/sysconfig/network',
+}
+
+exec { 'etc-hosts':
+    command => '/bin/echo "127.0.0.1 drutils-dev" > /etc/hosts',
+    unless  => '/bin/grep -q "127.0.0.1 drutils-dev" /etc/hosts',
+}
+
 package { 'git':
   ensure => installed
 }
