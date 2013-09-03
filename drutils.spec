@@ -1,7 +1,7 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
 Version: 1.9
-Release: 8
+Release: 9
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
@@ -53,6 +53,14 @@ rm -rf %{buildroot}
 %dir /var/nappl
 
 %changelog
+* Tue Sep 03 2013 Mark Phillips <embeepea@git> 1.9-9
+- fix tabs in Makefile (embeepea@git)
+- fix import, namespace issues, add --type=apache option (embeepea@git)
+- create ApacheContainer.py (embeepea@git)
+- refactor nappl into one py file per class (embeepea@git)
+- add --install option (embeepea@git)
+- fix existence test for apache symlink (embeepea@git)
+
 * Sun Sep 01 2013 Mark Phillips <embeepea@git> 1.9-8
 - adds --db-load option to nappl (embeepea@git)
 - adds --db-dump option (embeepea@git)
