@@ -1,3 +1,5 @@
+import os, json
+
 class NapplMeta:
     def __init__(self, appName):
         self.appName = appName

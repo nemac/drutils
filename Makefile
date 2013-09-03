@@ -23,6 +23,7 @@ install:
     install -D Nappl.py ${libdir}/Nappl.py
     install -D EtcHoster.py   ${libdir}/EtcHoster.py  
     install -D Container.py ${libdir}/Container.py
+    install -D ApacheContainer.py ${libdir}/ApacheContainer.py
     install -D DrupalContainer.py ${libdir}/DrupalContainer.py
 	${EDIT_LIB_DIR} < nappl > nappl.edited ; install -D -m 0755 nappl.edited ${bindir}/nappl ; /bin/rm -f nappl.edited
 	mkdir -p ${root}var/drutils/mysql

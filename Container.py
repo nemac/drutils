@@ -1,9 +1,6 @@
 import sys, re, os, optparse, shutil, json, drutils, subprocess, time
 
-from Nappl import *
-from NapplMeta import *
-
-class Container:
+class Container(object):
     def __init__(self, appName):
         self.appName = appName
         self.meta = None

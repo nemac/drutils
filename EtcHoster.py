@@ -1,3 +1,5 @@
+import os
+
 class EtcHoster:
     """Utility class to manage adding/removing lines from /etc/hosts corresponding
     to an application name.  Only attempts to modify /etc/hosts if the user running
