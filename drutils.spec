@@ -1,7 +1,7 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
 Version: 1.9
-Release: 14
+Release: 15
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
@@ -66,6 +66,9 @@ rm -rf %{buildroot}
 %dir /deploy
 
 %changelog
+* Tue Sep 03 2013 Mark Phillips <embeepea@git> 1.9-15
+- really include /var/vsites in install (embeepea@git)
+
 * Tue Sep 03 2013 Mark Phillips <embeepea@git> 1.9-14
 - install creates /var/vsites (embeepea@git)
 
