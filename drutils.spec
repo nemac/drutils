@@ -28,6 +28,7 @@ drush commands.
 /bin/chmod g=rwsx /var/nappl
 /bin/chgrp nappl /var/drutils /var/drutils/mysql
 /bin/chmod g=rwsx /var/drutils /var/drutils/mysql
+/bin/chown git.git /deploy
 /bin/chmod g=rwsx /deploy
 
 %install
