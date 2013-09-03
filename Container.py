@@ -1,5 +1,8 @@
 import sys, re, os, optparse, shutil, json, drutils, subprocess, time
 
+from Nappl import *
+from NapplMeta import *
+
 class Container(object):
     def __init__(self, appName):
         self.appName = appName
@@ -18,6 +21,10 @@ class Container(object):
             container = DrupalContainer(appName)
             container.meta = meta
             return container
+        if meta.data['application']['type'] == "apache":
+            container = ApacheContainer(appName)
+            container.meta = meta
+            return container
         raise Exception("Unknown container type '%s'" % meta.data['application']['type'])
 
     @staticmethod
@@ -33,4 +40,6 @@ class Container(object):
             apps.append(a.data)
         return apps
 
+from DrupalContainer import *
+from ApacheContainer import *
 

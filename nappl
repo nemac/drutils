@@ -3,9 +3,12 @@
 import sys
 sys.path.append(".") # this line gets replaced by `make install`
 
-import nappl, re, os, optparse, shutil, json
+import re, os, optparse, shutil, json
 
+from Nappl import *
+from NapplMeta import *
 from Container import *
+from ApacheContainer import *
 from DrupalContainer import *
 
 if __name__ == "__main__":
@@ -53,13 +56,17 @@ if __name__ == "__main__":
         appName = args[0]
         if opts.type == "drupal":
             c = DrupalContainer(appName)
-            c.create()
-            if opts.init is True:
-                c.init()
+        elif opts.type == "apache":
+            c = ApacheContainer(appName)
+        else:
+            raise Exception("unknown container type: %s" % opts.type)
+        c.create()
+        if opts.init is True:
+            c.init()
 
     elif opts.deleteContainer:
         appName = args[0]
-        c = DrupalContainer(appName)
+        c = Container.load(appName)
         c.delete()
 
     elif opts.dbDump:

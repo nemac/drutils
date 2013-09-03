@@ -20,7 +20,7 @@ class ApacheContainer(Container):
                             % self.appName)
         self.meta.data['application'] = {
             'name'      : self.appName,
-            'type'      : 'drupal',
+            'type'      : 'apache',
             'location'  : "/var/vsites/%s" % self.appName
         }
         self.meta.save()
@@ -43,15 +43,21 @@ class ApacheContainer(Container):
             rmtree(meta.dir)
 
     def init(self):
-        """Populate an Apache container with a placeholder index.html file, an initial site.conf file,
-        and initialize it as a new git repo.
-        """
+        """Populate an Apache container with an htmldir, a placeholder index.html file,
+        an initial site.conf file, and initialize it as a new git repo."""
         # create the application directory (vsitesdir), if it does not yet exist
         vsitesdir = "/var/vsites/%s" % self.appName
         if not os.path.exists(vsitesdir):
             os.mkdir(vsitesdir)
-            with open("%s/index.html" % vsitesdir, "w") as f:
-                f.write(self.appName)
+        # create the html subdir, if it does not yet exist
+        htmldir = "%s/html" % vsitesdir
+        if not os.path.exists(htmldir):
+            os.mkdir(htmldir)
+            # create the index.html file, if it does not exist
+            indexhtml = "%s/index.html" % htmldir
+            if not os.path.exists(indexhtml):
+                with open(indexhtml, "w") as f:
+                    f.write(self.appName)
         # write the apache conf file for the application
         apacheconf = "%s/site.conf" % vsitesdir
         if not os.path.exists(apacheconf):
