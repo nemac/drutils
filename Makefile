@@ -30,3 +30,5 @@ install:
 	chmod g=,o= ${root}var/drutils/mysql
 	mkdir -p ${root}var/nappl
 	chmod g=,o= ${root}var/nappl
+	mkdir -p ${root}deploy
+

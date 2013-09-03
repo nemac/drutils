@@ -21,12 +21,14 @@ drush commands.
 
 %pre
 /usr/bin/getent group nappl || /usr/sbin/groupadd -r nappl
+/usr/bin/getent user git || /usr/sbin/useradd -r -m -U git
 
 %post
 /bin/chgrp nappl /var/nappl
 /bin/chmod g=rwsx /var/nappl
 /bin/chgrp nappl /var/drutils /var/drutils/mysql
 /bin/chmod g=rwsx /var/drutils /var/drutils/mysql
+/bin/chmod g=rwsx /deploy
 
 %install
 rm -rf %{buildroot}
@@ -51,6 +53,7 @@ rm -rf %{buildroot}
 /usr/bin/nappl
 %dir /var/drutils/mysql
 %dir /var/nappl
+%dir /deploy
 
 %changelog
 * Tue Sep 03 2013 Mark Phillips <embeepea@git> 1.9-10
