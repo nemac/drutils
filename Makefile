@@ -19,12 +19,12 @@ install:
 	${EDIT_LIB_DIR} < dblist > dblist.edited ; install -D -m 0755 dblist.edited ${bindir}/dblist ; /bin/rm -f dblist.edited
 	${EDIT_LIB_DIR} < dbdrop > dbdrop.edited ; install -D -m 0755 dbdrop.edited ${bindir}/dbdrop ; /bin/rm -f dbdrop.edited
 	${EDIT_LIB_DIR} < dbpw > dbpw.edited ; install -D -m 0755 dbpw.edited ${bindir}/dbpw ; /bin/rm -f dbpw.edited
-    install -D NapplMeta.py   ${libdir}/NapplMeta.py  
-    install -D Nappl.py ${libdir}/Nappl.py
-    install -D EtcHoster.py   ${libdir}/EtcHoster.py  
-    install -D Container.py ${libdir}/Container.py
-    install -D ApacheContainer.py ${libdir}/ApacheContainer.py
-    install -D DrupalContainer.py ${libdir}/DrupalContainer.py
+	install -D NapplMeta.py	  ${libdir}/NapplMeta.py  
+	install -D Nappl.py ${libdir}/Nappl.py
+	install -D EtcHoster.py	  ${libdir}/EtcHoster.py  
+	install -D Container.py ${libdir}/Container.py
+	install -D ApacheContainer.py ${libdir}/ApacheContainer.py
+	install -D DrupalContainer.py ${libdir}/DrupalContainer.py
 	${EDIT_LIB_DIR} < nappl > nappl.edited ; install -D -m 0755 nappl.edited ${bindir}/nappl ; /bin/rm -f nappl.edited
 	mkdir -p ${root}var/drutils/mysql
 	chmod g=,o= ${root}var/drutils/mysql
