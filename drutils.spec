@@ -1,7 +1,7 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
 Version: 1.9
-Release: 16
+Release: 17
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
@@ -66,6 +66,9 @@ rm -rf %{buildroot}
 %dir /deploy
 
 %changelog
+* Tue Sep 03 2013 Mark Phillips <embeepea@git> 1.9-17
+- change type of drupal app from "apache" to "drupal" (embeepea@git)
+
 * Tue Sep 03 2013 Mark Phillips <embeepea@git> 1.9-16
 - fix ownership of /var/vsites on install (embeepea@git)
 
