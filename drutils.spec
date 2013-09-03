@@ -1,7 +1,7 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
 Version: 1.9
-Release: 12
+Release: 13
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
@@ -57,6 +57,9 @@ rm -rf %{buildroot}
 %dir /deploy
 
 %changelog
+* Tue Sep 03 2013 Mark Phillips <embeepea@git> 1.9-13
+- install sets /deploy dir ownership to git.git (embeepea@git)
+
 * Tue Sep 03 2013 Mark Phillips <embeepea@git> 1.9-12
 - fix problem checking for git user (embeepea@git)
 
