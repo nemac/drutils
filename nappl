@@ -22,6 +22,9 @@ if __name__ == "__main__":
     parser.add_option('--delete-container',
                       help='delete an application container',
                       dest='deleteContainer', default=False, action='store_true')
+    parser.add_option('--make-deployable',
+                      help='make a container be deployable, by setting up a git repo at /deploy/APPNAME.git',
+                      dest='makeDeployable', default=False, action='store_true')
     parser.add_option('--type',
                       help='with --create, create a container for an application of'
                       + ' the given TYPE; allowed types are: "drupal"',
@@ -93,23 +96,33 @@ if __name__ == "__main__":
 
     elif opts.listContainers:
         apps = Container.list_containers()
-        format = "%-40s  %-10s  %-10s  %s"
+        format = "%-40s  %-10s  %-10s  %-40s  %s"
         print format % (
             "Application Name",
             "Type",
             "Occupancy",
-            "Directory"
+            "Directory",
+            "Deploy Repo",
             )
         print format % (
             "----------------",
             "----",
             "---------",
-            "---------"
+            "---------",
+            "-----------"
             )
         for app in apps:
             print format % (
                 app['application']['name'],
                 app['application']['type'],
                 "OCCUPIED" if os.path.exists(app['application']['location']) else "VACANT",
-                app['application']['location']
+                app['application']['location'],
+                app['application']['deployrepo'] if 'deployrepo' in app['application'] else ""
                 )
+
+    elif opts.makeDeployable:
+        appName = args[0]
+        c = Container.load(appName)
+        c.makeDeployable()
+
+

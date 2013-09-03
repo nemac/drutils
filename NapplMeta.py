@@ -6,6 +6,8 @@ class NapplMeta:
         self.dir = "/var/nappl/%s" % self.appName
         self.datafile = "/var/nappl/%s/metadata.json" % self.appName
         self.data = {}
+        if os.path.exists(self.datafile):
+            self.load()
     def load(self):
         with open(self.datafile, 'r') as f:
             self.data = json.loads(f.read())

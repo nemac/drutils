@@ -11,19 +11,16 @@ class ApacheContainer(Container):
         super(ApacheContainer, self).__init__(appName)
 
     def create(self, dbname=None):
+        super(ApacheContainer, self).create()
         #
-        # create the nappl metadata file
+        # add apache-specific settings to application metadata file
         #
-        self.meta = NapplMeta(self.appName)
-        if os.path.exists(self.meta.dir):
-            raise Exception("Cowardly refusing to overwrite existing container for application '%s'"
-                            % self.appName)
-        self.meta.data['application'] = {
-            'name'      : self.appName,
-            'type'      : 'apache',
-            'location'  : "/var/vsites/%s" % self.appName
-        }
+        self.meta.data['application']['type'] = 'apache'
+        self.meta.data['application']['location'] = "/var/vsites/%s" % self.appName
         self.meta.save()
+        #
+        # Create an entry for this web site in /etc/hosts
+        #
         EtcHoster(self.appName).add_line()
 
     def delete(self):
@@ -38,9 +35,7 @@ class ApacheContainer(Container):
             os.remove(apacheconf_symlink)
         EtcHoster(self.appName).remove_lines()
         # delete the nappl metadata dir
-        meta = NapplMeta(self.appName)
-        if os.path.exists(meta.dir):
-            rmtree(meta.dir)
+        super(ApacheContainer, self).delete()
 
     def init(self):
         """Populate an Apache container with an htmldir, a placeholder index.html file,
@@ -77,6 +72,7 @@ class ApacheContainer(Container):
         with open("%s/.gitignore" % vsitesdir, "w") as f:
             f.write("*~\n")
         os.system("cd %s ; git init -q ; git add . ; git commit -q -m 'initial nappl setup'" % vsitesdir)
+        self.makeDeployable()
         self.install()
 
     def install(self):

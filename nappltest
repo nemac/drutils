@@ -4,10 +4,17 @@ import os
 os.environ['DRUSH_DL_COMMAND'] = "tar xfz %s/drupal-7.23.tgz ; mv drupal-7.23 html" % os.getcwd()
 os.environ['DRUSH_SITE_INSTALL_COMMAND'] = "touch sites/default/settings.php"
 
-import nappl, unittest, sys, shutil
+import unittest, sys, shutil
+sys.path.append(".")
 
-sys.path.append("/usr/lib/drutils")
 import drutils
+
+import Nappl as nappl
+from NapplMeta import *
+from EtcHoster import *
+from Container import *
+from ApacheContainer import *
+from DrupalContainer import *
 
 APPNAME         = "foobar.nemac.org"
 DBNAME          = "foobar"
@@ -43,7 +50,7 @@ def cleanup(appname=None, dbname=None):
         if os.path.lexists(apacheconf_symlink):
             os.remove(apacheconf_symlink)
         # remove app name from /etc/hosts
-        nappl.EtcHoster(appname).remove_lines()
+        EtcHoster(appname).remove_lines()
 
 class TestFunctions(unittest.TestCase):
 
@@ -80,7 +87,7 @@ class TestNapplMeta(unittest.TestCase):
         cleanup(appname=APPNAME, dbname=DBNAME)
 
     def test_basic(self):
-        m = nappl.NapplMeta(APPNAME)
+        m = NapplMeta(APPNAME)
         m.data = {
             'section1' : {
                 'name' : 'fred',
@@ -92,7 +99,7 @@ class TestNapplMeta(unittest.TestCase):
             }
         }
         m.save()
-        m = nappl.NapplMeta(APPNAME)
+        m = NapplMeta(APPNAME)
         m.load()
         self.assertEqual(m.data['section1']['name'], 'fred')
         self.assertEqual(m.data['section1']['color'], 'white')
@@ -106,8 +113,8 @@ class TestDrupalContainer(unittest.TestCase):
         cleanup(appname=APPNAME, dbname=DBNAME)
 
     def test_constructor(self):
-        c = nappl.DrupalContainer(APPNAME)
-        self.assertTrue(isinstance(c, nappl.DrupalContainer))
+        c = DrupalContainer(APPNAME)
+        self.assertTrue(isinstance(c, DrupalContainer))
         self.assertEqual(c.appName, APPNAME)
 
     def verify_creation(self, APPNAME, DBNAME):
@@ -133,12 +140,12 @@ class TestDrupalContainer(unittest.TestCase):
                         msg="Drutils mysql cnf file %s not created" % drutils_cnf_file)
 
     def test_create(self):
-        c = nappl.DrupalContainer(APPNAME)
+        c = DrupalContainer(APPNAME)
         c.create()
         self.verify_creation(APPNAME, DBNAME)
 
     def test_delete(self):
-        c = nappl.DrupalContainer(APPNAME)
+        c = DrupalContainer(APPNAME)
         c.create()
         self.verify_creation(APPNAME, DBNAME)
         c.delete()
@@ -171,7 +178,7 @@ class TestDrupalContainer(unittest.TestCase):
 
         
     def test_init(self):
-        c = nappl.DrupalContainer(APPNAME)
+        c = DrupalContainer(APPNAME)
         c.create()
         self.verify_creation(APPNAME, DBNAME)
         c.init()
