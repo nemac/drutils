@@ -8,6 +8,7 @@ Source: %{name}-%{version}.tar.gz
 URL: http://github.com/nemac/drutils
 BuildArch: noarch
 BuildRoot: %{_tmppath}/%{name}-root
+Requires: httpd
 
 %description
 Drutils is a collection of scripts to make the tasks of creating, backing up, and
@@ -30,6 +31,11 @@ drush commands.
 /bin/chmod g=rwsx /var/drutils /var/drutils/mysql
 /bin/chown git.git /deploy
 /bin/chmod g=rwsx /deploy
+/bin/echo "ServerName `/bin/hostname`:80" > /etc/httpd/conf.d/vsites.conf
+/bin/echo "NameVirtualHost *:80" >> /etc/httpd/conf.d/vsites.conf
+/bin/echo "Include /var/vsites/conf/*.conf" >> /etc/httpd/conf.d/vsites.conf
+/bin/chown -R nappl.nappl /var/vsites
+/bin/chmod -R g=rwsx /var/vsites
 
 %install
 rm -rf %{buildroot}
