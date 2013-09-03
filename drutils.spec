@@ -1,7 +1,7 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
 Version: 1.9
-Release: 10
+Release: 11
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
@@ -56,6 +56,9 @@ rm -rf %{buildroot}
 %dir /deploy
 
 %changelog
+* Tue Sep 03 2013 Mark Phillips <embeepea@git> 1.9-11
+- install creates git user, /deploy dir with correct permissions (embeepea@git)
+
 * Tue Sep 03 2013 Mark Phillips <embeepea@git> 1.9-10
 - only run vagrant shell provision scripts if necessary; puppet now installs
   hostname entry (embeepea@git)
