@@ -34,7 +34,7 @@ drush commands.
 /bin/echo "ServerName `/bin/hostname`:80" > /etc/httpd/conf.d/vsites.conf
 /bin/echo "NameVirtualHost *:80" >> /etc/httpd/conf.d/vsites.conf
 /bin/echo "Include /var/vsites/conf/*.conf" >> /etc/httpd/conf.d/vsites.conf
-/bin/chown -R nappl.nappl /var/vsites
+/bin/chgrp -R nappl /var/vsites
 /bin/chmod -R g=rwsx /var/vsites
 
 %install
