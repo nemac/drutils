@@ -13,4 +13,4 @@ scripts has been replaced with functionality in `nappl`, and new
 development should take place with `nappl`.
 
 The old `drutils` README file is still available as
-[DRUTILS.md](https://github.com/nemac/drutils/blob/master/README.md).
+[DRUTILS.md](https://github.com/nemac/drutils/blob/master/DRUTILS.md).
