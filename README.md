@@ -54,18 +54,45 @@ Basic Nappl Usage
 =================
 
 All Nappl actions are done using the `nappl` command, which takes
-various options and/or arguments to control which actions are done.
+various options and/or arguments to control what happens.
 Nappl manages a collection of application containers, and applications
 contained in those containers.  You can get a list of the currently
-available application containers by typing
+available application containers on the system by typing
 
     nappl --list-containers
+
+Creating a Container
+====================
+
+To create a new application container, use the `--create-container`
+option.  This option requires an additional option `--type` which
+specifies the type of application to create a container for; currently
+Nappl recognizes `--type=apache`, for a static html web site, and
+`--type=drupal` for a Drupal web site.
+
+To create a container for a static html web site called foo.example.org:
+
+    nappl --create-container --type=apache [ --init ] foo.example.org
     
-which will print out a table looking something like this:
+To create a container for a Drupal web site called bar.example.org:
 
-    Name   Dir    VHost     Service   Yaya
-    ----   ---    -----     -------   ----
-    one    asdf   hoohoo    neenee    asdf/wwer/vp
-    one    asdf   hoohoo    neenee    asdf/wwer/vp
+    nappl --create-container --type=apache [ --init ] bar.example.org
+    
+If the optional `--init` option is present, Nappl will populate the new
+container with a newly created application, including a freshly-initialized
+git repository.  The new application's git project will reside at the location
+/var/vsites/APPLICATION_NAME (so, /var/vsites/foo.example.org or
+/var/vsites/bar.example.org for the above examples).
 
-And so on.
+bla bla don't forget to `sudo service httpd restart`
+
+If the `--init` option is not present, Nappl will create an empty container
+for the application, and you will later need to populate that
+container with an actual application; see "Populating a Container" below.
+
+Populating a Container
+======================
+
+bla bla how to populate an empty container
+
+bla bla don't forget to `sudo service httpd restart`
