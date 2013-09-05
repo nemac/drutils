@@ -22,7 +22,7 @@ drush commands.
 
 %pre
 /usr/bin/getent group nappl || /usr/sbin/groupadd -r nappl
-/usr/bin/getent passwd git  || /usr/sbin/useradd -r -m -U git
+/usr/bin/getent passwd git  || /usr/sbin/useradd -r -m -G nappl -U git
 
 %post
 /bin/chgrp nappl /var/nappl
@@ -44,6 +44,7 @@ make root=%{buildroot}/ prefix=%{buildroot}/usr dest_prefix=/usr install
 
 %postun
 /usr/sbin/groupdel nappl
+/usr/sbin/userdel git
 
 %clean
 rm -rf %{buildroot}
