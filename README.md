@@ -76,7 +76,7 @@ To create a container for a static html web site called foo.example.org:
     
 To create a container for a Drupal web site called bar.example.org:
 
-    nappl --create-container --type=apache [ --init ] bar.example.org
+    nappl --create-container --type=drupal [ --init ] bar.example.org
     
 If the optional `--init` option is present, Nappl will populate the new
 container with a newly created application, including a freshly-initialized
@@ -84,7 +84,11 @@ git repository.  The new application's git project will reside at the location
 /var/vsites/APPLICATION_NAME (so, /var/vsites/foo.example.org or
 /var/vsites/bar.example.org for the above examples).
 
-bla bla don't forget to `sudo service httpd restart`
+Note after creating a container of either of the above two types, you will
+need to restart the apache httpd server on the system in order to view
+the application in a browser:
+
+    sudo service httpd restart
 
 If the `--init` option is not present, Nappl will create an empty container
 for the application, and you will later need to populate that
