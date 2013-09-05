@@ -1,7 +1,7 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
 Version: 1.9
-Release: 17
+Release: 18
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
@@ -67,6 +67,16 @@ rm -rf %{buildroot}
 %dir /deploy
 
 %changelog
+* Wed Sep 04 2013 Mark Phillips <embeepea@git> 1.9-18
+- adds git user to nappl group on install (embeepea@git)
+- updates README (embeepea@git)
+- updates README (embeepea@git)
+- updates README (embeepea@git)
+- updates README (embeepea@git)
+- updates README.md (embeepea@git)
+- rename drutils's old README.md to DRUTILS.md; create new README.md for nappl
+  (embeepea@git)
+
 * Tue Sep 03 2013 Mark Phillips <embeepea@git> 1.9-17
 - change type of drupal app from "apache" to "drupal" (embeepea@git)
 
