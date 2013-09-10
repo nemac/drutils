@@ -42,10 +42,6 @@ rm -rf %{buildroot}
 echo make root=%{buildroot}/ prefix=%{buildroot}/usr dest_prefix=/usr install
 make root=%{buildroot}/ prefix=%{buildroot}/usr dest_prefix=/usr install
 
-%postun
-/usr/sbin/groupdel nappl
-/usr/sbin/userdel git
-
 %clean
 rm -rf %{buildroot}
 
