@@ -45,12 +45,21 @@ if __name__ == "__main__":
     parser.add_option('--list-containers',
                       help='list all application containers present',
                       dest='listContainers', default=False, action='store_true')
-    parser.add_option('--db-dump',
-                      help='make a database dump file of the application',
-                      dest='dbDump', default=False, action='store_true')
-    parser.add_option('--db-load',
+    parser.add_option('--dump-db',
+                      help='write a database dump file of the application',
+                      dest='dumpDb', default=False, action='store_true')
+    parser.add_option('--load-db',
                       help='load a database dump file into the container',
-                      dest='dbLoad', type='string')
+                      dest='loadDb', type='string')
+    parser.add_option('--dump-files',
+                      help="write a compressed tar backup of application's files",
+                      dest='dumpFiles', default=False, action='store_true')
+    parser.add_option('--load-files',
+                      help="load a compressed tar backup of application's files",
+                      dest='loadFiles', type='string')
+    parser.add_option('--dump-all',
+                      help='write both a database dump, and a files archive of the application',
+                      dest='dumpAll', default=False, action='store_true')
     (opts, args) = parser.parse_args()
 
 
@@ -72,7 +81,7 @@ if __name__ == "__main__":
         c = Container.load(appName)
         c.delete()
 
-    elif opts.dbDump:
+    elif opts.dumpDb:
         appName = args[0]
         c = Container.load(appName)
         if not c.git_wd_clean():
@@ -82,12 +91,41 @@ if __name__ == "__main__":
             if response != 'y':
                 print "No dump created."
                 sys.exit(0)
-        c.dbdump()
+        c.dump_db()
 
-    elif opts.dbLoad:
+    elif opts.loadDb:
         appName = args[0]
         c = Container.load(appName)
-        c.dbload(opts.dbLoad)
+        c.load_db(opts.loadDb)
+
+    elif opts.dumpFiles:
+        appName = args[0]
+        c = Container.load(appName)
+        if not c.git_wd_clean():
+            print ("The application in container %s has edits which"
+                   + " have not been commited to its git repo." ) % appName
+            response = raw_input("Do you really want to create a files archive [N|y]? ")
+            if response != 'y':
+                print "No archive created."
+                sys.exit(0)
+        c.dump_files()
+
+    elif opts.loadFiles:
+        appName = args[0]
+        c = Container.load(appName)
+        c.load_files(opts.loadFiles)
+
+    elif opts.dumpAll:
+        appName = args[0]
+        c = Container.load(appName)
+        if not c.git_wd_clean():
+            print ("The application in container %s has edits which"
+                   + " have not been commited to its git repo." ) % appName
+            response = raw_input("Do you really want to create the dumps [N|y]? ")
+            if response != 'y':
+                print "No dumps created."
+                sys.exit(0)
+        c.dump_all()
 
     elif opts.install:
         appName = args[0]

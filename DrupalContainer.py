@@ -140,19 +140,67 @@ class DrupalContainer(ApacheContainer):
         edit_drupal_gitignore(vsitesdir)
         super(DrupalContainer, self).init()
 
-    def dbdump(self):
+    def dump_db(self, timestamp=None):
         """Write a compressed sql dump file for the application into the current directory."""
         vsitesdir = "/var/vsites/%s" % self.appName
         sha = bash_command("cd %s ; git rev-parse --short HEAD" % vsitesdir)
         if not self.git_wd_clean():
             sha = sha + "--edited"
-        timestamp = time.strftime("%Y-%m-%d--%H-%M-%S", time.localtime())
+        if timestamp is None:
+            timestamp = time.strftime("%Y-%m-%d--%H-%M-%S", time.localtime())
         dumpfile = "%s--%s--%s.sql.gz" % (self.appName, sha, timestamp)
         os.system("drush -r %s/html sql-dump | gzip > %s" % (vsitesdir, dumpfile))
         print "wrote %s" % dumpfile
 
-    def dbload(self, dumpfile):
+    def load_db(self, dumpfile):
         """Load a compressed sql dump file into the database for this container."""
         # 'git rev-parse --short HEAD' will print current commit sha
         vsitesdir = "/var/vsites/%s" % self.appName
         os.system("gunzip < %s | drush -r %s/html sqlc" % (dumpfile, vsitesdir))
+        print "loaded database from %s" % dumpfile
+
+    def get_files_dirs(self):
+        vsitesdir = "/var/vsites/%s" % self.appName
+        dirs = []
+        for dir in os.listdir("%s/html/sites" % vsitesdir):
+            if os.path.isdir("%s/html/sites/%s" % (vsitesdir,dir)):
+                for f in ['files','private']:
+                    if (os.path.exists("%s/html/sites/%s/%s" % (vsitesdir,dir,f))
+                        and os.path.isdir("%s/html/sites/%s/%s" % (vsitesdir,dir,f))):
+                        dirs.append("sites/%s/%s" % (dir,f))
+        return dirs
+
+    def dump_files(self, timestamp=None):
+        """Write a compressed tar file for the drupal application's files into the current directory."""
+        vsitesdir = "/var/vsites/%s" % self.appName
+        sha = bash_command("cd %s ; git rev-parse --short HEAD" % vsitesdir)
+        if not self.git_wd_clean():
+            sha = sha + "--edited"
+        if timestamp is None:
+            timestamp = time.strftime("%Y-%m-%d--%H-%M-%S", time.localtime())
+        dumpfile = "%s--%s--%s.files.tgz" % (self.appName, sha, timestamp)
+        dirs = self.get_files_dirs()
+        cmd = "(cd %s/html ; tar cfz - %s) > %s" % (vsitesdir, " ".join(dirs), dumpfile)
+        os.system(cmd)
+        print "wrote %s" % dumpfile
+
+    def load_files(self, dumpfile):
+        """Load a compressed tar file of uploaded files into the application."""
+        if not os.path.exists(dumpfile):
+            raise Exception("Dump file %s not found" % dumpfile)
+        vsitesdir = "/var/vsites/%s" % self.appName
+        dirs = self.get_files_dirs()
+        for d in dirs:
+            p = "%s/html/%s" % (vsitesdir, d)
+            if os.path.isdir(p):
+                shutil.rmtree(p)
+        os.system("cat %s | (cd %s/html ; tar xfz -)" % (dumpfile, vsitesdir))
+        print "loaded files from %s" % dumpfile
+
+    def dump_all(self, timestamp=None):
+        """Write both a database dump and a files archive into the current directory."""
+        vsitesdir = "/var/vsites/%s" % self.appName
+        if timestamp is None:
+            timestamp = time.strftime("%Y-%m-%d--%H-%M-%S", time.localtime())
+        self.dump_db(timestamp)
+        self.dump_files(timestamp)
