@@ -40,7 +40,6 @@ def create_database(dbname):
     if drutils.database_user_exists(dbname, DB_SU, DB_SU_PW):
         raise DatabaseError("There is already a mysql user named '%s'." % dbname)
     drutils.create_database_and_user(dbname, DB_SU, DB_SU_PW)
-    return True
 
 def edit_drupal_settingsphp(vsitesdir, appname):
     settingsphp = "%s/html/sites/default/settings.php" % vsitesdir

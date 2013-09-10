@@ -41,7 +41,8 @@ class DrupalContainer(ApacheContainer):
         #
         if dbname is None:
             dbname = infer_database_name(self.appName)
-        if create_database(dbname):
+        try:
+            create_database(dbname)
             #print "Created database/user '%s'" % dbname
             pw = drutils.get_db_password(dbname)
             #print "Database password: '%s'" % pw
@@ -51,7 +52,8 @@ class DrupalContainer(ApacheContainer):
               'password' : pw
             }
             self.meta.save()
-        else:
+        except:
+            super(DrupalContainer, self).delete()
             raise Exception("Cannot create database/user '%s'; container not created." % dbname)
         #
         # create the database credentials files
