@@ -1,7 +1,7 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
 Version: 1.9
-Release: 19
+Release: 20
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
@@ -63,6 +63,9 @@ rm -rf %{buildroot}
 %dir /deploy
 
 %changelog
+* Tue Sep 10 2013 Mark Phillips <embeepea@git> 1.9-20
+- do not remove git user, nappl group on uninstall (embeepea@git)
+
 * Tue Sep 10 2013 Mark Phillips <embeepea@git> 1.9-19
 - DrupalContainer.create() fails gracefully and cleans up if database creation
   fails (embeepea@git)
