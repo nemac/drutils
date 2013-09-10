@@ -33,11 +33,12 @@ class ApacheContainer(Container):
         apacheconf_symlink = "/var/vsites/conf/%s.conf" % self.appName
         if os.path.lexists(apacheconf_symlink):
             os.remove(apacheconf_symlink)
+            ApacheContainer.restart_apache()
         EtcHoster(self.appName).remove_lines()
         # delete the nappl metadata dir
         super(ApacheContainer, self).delete()
 
-    def init(self):
+    def init(self, gitmessage=None):
         """Populate an Apache container with an htmldir, a placeholder index.html file,
         an initial site.conf file, and initialize it as a new git repo."""
         # create the application directory (vsitesdir), if it does not yet exist
@@ -71,9 +72,26 @@ class ApacheContainer(Container):
         # initialize a git repo for the application
         with open("%s/.gitignore" % vsitesdir, "w") as f:
             f.write("*~\n")
-        os.system("cd %s ; git init -q ; git add . ; git commit -q -m 'initial nappl setup'" % vsitesdir)
+        if gitmessage is None:
+            gitmessage = "initial nappl setup"
+        else:
+            gitmessage = "initial nappl setup (%s)" % gitmessage
+        os.system("cd %s ; git init -q ; git add . ; git commit -q -m '%s'" % (vsitesdir, gitmessage.replace("'", "\\'")))
         self.makeDeployable()
         self.install()
+
+    @staticmethod
+    def restart_apache():
+        """Restart apache if possible, otherwise display a warning message."""
+        code = os.system("sudo -n service httpd restart")
+        if code != 0:
+            print "WARNING ***"
+            print "WARNING *** Apache restart required.  Your account does not have the appropriate"
+            print "WARNING *** permissions for restarting Apache.  Someone with that permission needs"
+            print "WARNING *** to execute the command"
+            print "WARNING ***     sudo service httpd restart"
+            print "WARNING *** in order for the change(s) you have just made to completely take effect."
+            print "WARNING ***"
 
     def install(self):
         """Create a symlink in /var/vsites/conf for an application's apache conf file"""
@@ -85,6 +103,7 @@ class ApacheContainer(Container):
         if os.path.lexists(apacheconf_symlink):
             os.remove(apacheconf_symlink)
         os.symlink(apacheconf, apacheconf_symlink)
+        ApacheContainer.restart_apache()
 
     def git_wd_clean(self):
         """Return True iff the application in this container has no outstanding edits since

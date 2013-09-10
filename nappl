@@ -26,16 +26,19 @@ if __name__ == "__main__":
                       help='make a container be deployable, by setting up a git repo at /deploy/APPNAME.git',
                       dest='makeDeployable', default=False, action='store_true')
     parser.add_option('--type',
-                      help='with --create, create a container for an application of'
+                      help='with --create-container, create a container for an application of'
                       + ' the given TYPE; allowed types are: "drupal"',
                       dest='type', type='string')
     parser.add_option('--dbname',
-                      help='with --create, create a database named NAME, instead of'
+                      help='with --create-container, create a database named NAME, instead of'
                         + ' inferring it from the application name',
                       dest='dbname', type='string', metavar='NAME')
     parser.add_option('--init',
-                      help='initialize a new application in the container',
+                      help='with --create-container, initialize a new application in the container by downloading the latest version of Drupal',
                       dest='init', default=False, action='store_true')
+    parser.add_option('--import-drutils-dump',
+                      help="with --create-container, initialize a new application in the container by loading from a DUMPFILE written by drutils's `dumpsite` command",
+                      dest='importDrutilsDump', type='string', metavar='DUMPFILE')
     parser.add_option('--clone',
                       help='populate the container with a project by cloning the given git REPO',
                       dest='clone', type='string', metavar='REPO')
@@ -73,8 +76,10 @@ if __name__ == "__main__":
         else:
             raise Exception("unknown container type: %s" % opts.type)
         c.create()
-        if opts.init is True:
+        if opts.init:
             c.init()
+        elif opts.importDrutilsDump:
+            c.import_drutils_dump(opts.importDrutilsDump)
 
     elif opts.deleteContainer:
         appName = args[0]

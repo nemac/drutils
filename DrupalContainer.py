@@ -114,8 +114,7 @@ class DrupalContainer(ApacheContainer):
 
     def init(self):
         """Populate a Drupal container with a freshly downloaded (via drush) copy of Drupal,
-        and initialize it as a new git repo.
-        """
+        and initialize it as a new git repo."""
         # get the database name
         dbname = self.get_dbname()
         if dbname is None:
@@ -204,3 +203,76 @@ class DrupalContainer(ApacheContainer):
             timestamp = time.strftime("%Y-%m-%d--%H-%M-%S", time.localtime())
         self.dump_db(timestamp)
         self.dump_files(timestamp)
+
+    @staticmethod
+    def get_drutils_dump_info(dir):
+        """Return a dict with keys 'sqlfile' and 'docroot' containing the sql file name and document
+        root directory, respectively, from an unpacked drutils dump file in the given directory."""
+        drutils_info = { "sqlfile" : None, 'docroot' : None }
+        for f in os.listdir(dir):
+            m = re.match(r'^(.+)\.sql$', f)
+            if m and os.path.isfile("%s/%s" % (dir,f)):
+                drutils_info["sqlfile"] = f
+                continue
+            if (os.path.isdir("%s/%s" % (dir,f))
+                and os.path.exists("%s/%s/index.php" % (dir,f))):
+                drutils_info["docroot"] = f
+        return drutils_info
+
+    def import_drutils_dump(self, dumpfile):
+        """Populate a Drupal container with a new project obtained by importing from a dump file
+        that was written by the drutils `dumpsite` command, and initialize it as a new git repo."""
+        if not os.path.exists(dumpfile):
+            raise Exception("Drutils dump file %s not found" % dumpfile)
+        # get the database name
+        dbname = self.get_dbname()
+        if dbname is None:
+            raise Exception("Cannot find database name for application '%s'" % self.appName)
+        # get the database password
+        dbpassword = self.get_dbpassword()
+        if dbpassword is None:
+            raise Exception("Cannot find database password for application '%s'" % self.appName)
+        # create the application directory (vsitesdir)
+        vsitesdir = "/var/vsites/%s" % self.appName
+        if os.path.exists(vsitesdir):
+            raise Exception("Application directory %s already exists; refusing to overwrite" % vsitesdir)
+        os.mkdir(vsitesdir)
+        # create a temporary directory for unpacking the drutils dump file
+        tmpdir = "/tmp/nappl-%s" % os.getpid()
+        if os.path.exists(tmpdir):
+            if os.path.isdir(tmpdir):
+                shutil.rmtree(tmpdir)
+            else:
+                os.remove(tmpdir)
+        os.mkdir(tmpdir)
+        # unpack the drutils dump file into the tmp dir
+        print "unpacking dump file %s" % dumpfile
+        os.system("cat %s | (cd %s ; tar xfz -)" % (dumpfile, tmpdir))
+        drutils_info = DrupalContainer.get_drutils_dump_info(tmpdir)
+        # create the container's html dir
+        os.mkdir("%s/html" % vsitesdir)
+        # copy the docroot contents from the drutils dump into the html dir
+        print "copying Drupal files into container %s" % self.appName
+        os.system("(cd %s/%s ; tar cf - .) | (cd %s/html ; tar xf -)" % (tmpdir,drutils_info["docroot"],vsitesdir))
+        # make the new files writable by owner/group (but not other)
+        os.system("chmod u+w,g+w,o-w %s/html" % vsitesdir)
+        os.system("chmod u+w,g+w %s/html/sites/default" % vsitesdir)
+        os.system("chmod u+w,g+w %s/html/sites/default/settings.php" % vsitesdir)
+        os.system("(cd %s/html ; ( find . -type d -print | xargs chmod g+wxs ))" % vsitesdir)
+        # make the new uploaded files dir(s) writable by other
+        for dir in self.get_files_dirs():
+            os.system("chmod -R o+w %s/html/%s" % (vsitesdir,dir))
+        # edit the new drupal's settings.php file to point to the container's mysql credentials file
+        edit_drupal_settingsphp(vsitesdir, self.appName)
+        # use drush to load the sql file from the drutils dump
+        print "loading database from %s found in dump file" % drutils_info["sqlfile"]
+        os.system("drush -r %s/html sqlc < %s/%s" % (vsitesdir, tmpdir, drutils_info["sqlfile"]))
+        # edit the new drupal's .gitignore file so that it will allow settings.php in git repo
+        edit_drupal_gitignore(vsitesdir)
+        # initialize the apache container
+        print "initializing git repo in %s" % vsitesdir
+        super(DrupalContainer, self).init(gitmessage=("imported drutils dump file %s" % dumpfile))
+        # clean up the tmp dir
+        print "cleaning up"
+        os.system("chmod -R u+rw %s" % tmpdir) # make sure it's all writable first, so that the following command can delete it
+        shutil.rmtree(tmpdir)
