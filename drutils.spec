@@ -1,7 +1,7 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
 Version: 1.9
-Release: 20
+Release: 21
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
@@ -63,6 +63,11 @@ rm -rf %{buildroot}
 %dir /deploy
 
 %changelog
+* Tue Sep 10 2013 Mark Phillips <embeepea@git> 1.9-21
+- adds --import-drutils-dump option (embeepea@git)
+- change --db-dump/--db-load to --dump-db/--load-db, add --dump-files/--load-
+  files and --dump-all (embeepea@git)
+
 * Tue Sep 10 2013 Mark Phillips <embeepea@git> 1.9-20
 - do not remove git user, nappl group on uninstall (embeepea@git)
 
