@@ -88,19 +88,23 @@ class DrupalContainer(ApacheContainer):
 
     def delete(self):
         """Deletes a Drupal container"""
-        # get the database name
-        dbname = self.get_dbname()
-        # drop the database & user
-        (DB_SU, DB_SU_PW) = drutils.get_dbsu()
-        drutils.drop_database(dbname, DB_SU, DB_SU_PW)
-        drutils.drop_user(dbname, DB_SU, DB_SU_PW)
-        # delete the drutils mysql cnf file
-        drutils_mysql_cnf = "/var/drutils/mysql/%s.cnf" % dbname
-        if os.path.exists(drutils_mysql_cnf):
-            os.remove(drutils_mysql_cnf)
+        # drop the database
+        try:
+            dbname = self.get_dbname()
+            # drop the database & user
+            (DB_SU, DB_SU_PW) = drutils.get_dbsu()
+            drutils.drop_database(dbname, DB_SU, DB_SU_PW)
+            drutils.drop_user(dbname, DB_SU, DB_SU_PW)
+            # delete the drutils mysql cnf file
+            drutils_mysql_cnf = "/var/drutils/mysql/%s.cnf" % dbname
+            if os.path.exists(drutils_mysql_cnf):
+                os.remove(drutils_mysql_cnf)
+        except:
+            pass
         # delete the mysql credentials files
         mysql_credentials_dir = "/var/vsites/mysql/%s" % self.appName
-        rmtree(mysql_credentials_dir)
+        if os.path.exists(mysql_credentials_dir):
+            rmtree(mysql_credentials_dir)
         #
         # Delete the ApacheContainer
         #
