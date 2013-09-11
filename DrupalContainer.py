@@ -139,14 +139,14 @@ class DrupalContainer(ApacheContainer):
         # call the parent class method to initialize the git repo
         super(DrupalContainer, self).init()
 
-    def dump_db(self, timestamp=None):
-        """Write a compressed sql dump file for the container into the current directory."""
+    def dump_db(self, timestamp=None, dumpdir="/dumps"):
+        """Write a compressed sql dump file for a Drupal application."""
         sha = bash_command("cd %s ; git rev-parse --short HEAD" % self.projectdir())
         if not self.git_wd_clean():
             sha = sha + "--edited"
         if timestamp is None:
             timestamp = time.strftime("%Y-%m-%d--%H-%M-%S", time.localtime())
-        dumpfile = "%s--%s--%s.sql.gz" % (self.appName, sha, timestamp)
+        dumpfile = "%s/%s--%s--%s.sql.gz" % (dumpdir, self.appName, sha, timestamp)
         os.system("drush -r %s/html sql-dump | gzip > %s" % (self.projectdir(), dumpfile))
         print "wrote %s" % dumpfile
 
@@ -166,14 +166,14 @@ class DrupalContainer(ApacheContainer):
                         dirs.append("sites/%s/%s" % (dir,f))
         return dirs
 
-    def dump_files(self, timestamp=None):
-        """Write a compressed tar file for the drupal application's files into the current directory."""
+    def dump_files(self, timestamp=None, dumpdir="/dumps"):
+        """Write a compressed tar dump file containing a Drupal application's uploaded files."""
         sha = bash_command("cd %s ; git rev-parse --short HEAD" % self.projectdir())
         if not self.git_wd_clean():
             sha = sha + "--edited"
         if timestamp is None:
             timestamp = time.strftime("%Y-%m-%d--%H-%M-%S", time.localtime())
-        dumpfile = "%s--%s--%s.files.tgz" % (self.appName, sha, timestamp)
+        dumpfile = "%s/%s--%s--%s.files.tgz" % (dumpdir, self.appName, sha, timestamp)
         dirs = self.get_files_dirs()
         cmd = "(cd %s/html ; tar cfz - %s) > %s" % (self.projectdir(), " ".join(dirs), dumpfile)
         os.system(cmd)
@@ -191,12 +191,12 @@ class DrupalContainer(ApacheContainer):
         os.system("cat %s | (cd %s/html ; tar xfz -)" % (dumpfile, self.projectdir()))
         print "loaded files from %s" % dumpfile
 
-    def dump_all(self, timestamp=None):
-        """Write both a database dump and a files archive into the current directory."""
+    def dump_all(self, timestamp=None, dumpdir="/dumps"):
+        """Write both a database dump and a files archive."""
         if timestamp is None:
             timestamp = time.strftime("%Y-%m-%d--%H-%M-%S", time.localtime())
-        self.dump_db(timestamp)
-        self.dump_files(timestamp)
+        self.dump_db(timestamp=timestamp, dumpdir=dumpdir)
+        self.dump_files(timestamp=timestamp, dumpdir=dumpdir)
 
     @staticmethod
     def get_drutils_dump_info(dir):
