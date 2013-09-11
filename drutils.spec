@@ -1,7 +1,7 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
 Version: 1.9
-Release: 21
+Release: 22
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
@@ -63,6 +63,11 @@ rm -rf %{buildroot}
 %dir /deploy
 
 %changelog
+* Wed Sep 11 2013 Mark Phillips <embeepea@git> 1.9-22
+- better database name generation; better support for importing old d6 sites
+  (embeepea@git)
+- restructure container so application is in `project` subdir (embeepea@git)
+
 * Tue Sep 10 2013 Mark Phillips <embeepea@git> 1.9-21
 - adds --import-drutils-dump option (embeepea@git)
 - change --db-dump/--db-load to --dump-db/--load-db, add --dump-files/--load-
