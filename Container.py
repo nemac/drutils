@@ -9,32 +9,39 @@ class Container(object):
         self.meta = NapplMeta(self.appName)
 
     def create(self):
-        """Create a new application container"""
+        """Create a new application container.  This method simply creates the nappl
+        metadata directory for the container; Container subclasses should override this
+        method with an implementation that calls this method, then adds any necesssary
+        subclass-specific creation steps."""
         #
         # create the nappl metadata file
         #
         if os.path.exists(self.meta.dir):
-            raise Exception("Cowardly refusing to overwrite existing container for application '%s'"
+            raise Exception("Cowardly refusing to overwrite existing container :%s"
                             % self.appName)
-        self.meta.data['application'] = {
+        self.meta.data['container'] = {
             'name'      : self.appName
         }
         self.meta.save()
 
     def delete(self):
-        """Delete an application container"""
-        # if this application has a /deploy repo, delete it
-        if ( ('deployrepo' in self.meta.data['application'])
-             and os.path.exists(self.meta.data['application']['deployrepo']) ):
-            shutil.rmtree(self.meta.data['application']['deployrepo'])
+        """Delete an application container.  This method deletes the container's /deploy
+        repo, if any, and then deletes the container's nappl metadata directory.  Subclasses
+        should override this method with an implementation that does whatever subclass-specific
+        deleting work is needed, then calls this method afterwards."""
+        # if this container has a /deploy repo, delete it
+        if ( ('deployrepo' in self.meta.data['container'])
+             and os.path.exists(self.meta.data['container']['deployrepo']) ):
+            shutil.rmtree(self.meta.data['container']['deployrepo'])
         # delete the nappl metadata dir
         if os.path.exists(self.meta.dir):
             rmtree(self.meta.dir)
 
     def makeDeployable(self):
-        appdir = self.meta.data['application']['location']
+        """Create a /deploy repo for a container."""
+        appdir = self.meta.data['container']['location']
         if not os.path.exists(appdir + "/.git"):
-            raise Exception(("Cannot make deployable; application directory %s does not exist or is not"
+            raise Exception(("Cannot make deployable; container directory %s does not exist or is not"
                             + " set up as a git project.") % appdir)
         #
         # Create the deploy repo, if it does not yet exist
@@ -79,31 +86,32 @@ if os.path.exists("%(APPDIR)s"):
         #
         # Add deploy repo info to container metadata
         #
-        self.meta.data['application']['deployrepo'] = deployrepo
+        self.meta.data['container']['deployrepo'] = deployrepo
         self.meta.save()
 
     @staticmethod
     def load(appName):
-        """Return an instance of a Container object corresponding to an container.  The
-        returned object will have a 'meta' property which has been pre-loaded with 
-        a NapplMeta object containing the container metadata."""
+        """Return a Container instance corresponding to an existing
+        nappl container on the system. The returned object will have a
+        'meta' property which has been pre-loaded with a NapplMeta
+        object containing the container metadata."""
         meta = NapplMeta(appName)
         if not os.path.exists(meta.datafile):
             raise Exception("Container not found.")
-        if meta.data['application']['type'] == "drupal":
+        if meta.data['container']['type'] == "drupal":
             container = DrupalContainer(appName)
             container.meta = meta
             return container
-        if meta.data['application']['type'] == "apache":
+        if meta.data['container']['type'] == "apache":
             container = ApacheContainer(appName)
             container.meta = meta
             return container
-        raise Exception("Unknown container type '%s'" % meta.data['application']['type'])
+        raise Exception("Unknown container type '%s'" % meta.data['container']['type'])
 
     @staticmethod
     def list_containers():
-        """Return a list of the current application containers; each entry in the list
-        is a python dict containing metadata about the application."""
+        """Return a list of current containers on the system; each entry in the list
+        is a python dict containing metadata about the container."""
         if not os.path.exists("/var/nappl"):
             raise Exception("/var/nappl directory not found")
         apps = []
@@ -112,6 +120,10 @@ if os.path.exists("%(APPDIR)s"):
             apps.append(a.data)
         return apps
 
+#
+# We need to import these subclasses for use in the load() method above.  These
+# have to be imported after the definition of the Container class, rather than
+# at the top of the file, because they inherit from Container.
+#
 from DrupalContainer import *
 from ApacheContainer import *
-

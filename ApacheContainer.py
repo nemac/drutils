@@ -10,75 +10,106 @@ class ApacheContainer(Container):
     def __init__(self, appName):
         super(ApacheContainer, self).__init__(appName)
 
-    def create(self, dbname=None):
+    def create(self):
+        """Create a container for an Apache vhost application."""
+        #
+        # make sure the container dir (vsitesdir) does not already exist before getting started
+        #
+        if os.path.exists(self.vsitesdir()):
+            raise Exception("Container directory %s already exists; refusing to overwrite"
+                            % self.vsitesdir())
+        #
+        # create the basic container
+        #
         super(ApacheContainer, self).create()
         #
-        # add apache-specific settings to application metadata file
+        # add apache-specific settings to the nappl  metadata file
         #
-        self.meta.data['application']['type'] = 'apache'
-        self.meta.data['application']['location'] = "/var/vsites/%s" % self.appName
+        self.meta.data['container']['type'] = 'apache'
+        self.meta.data['container']['location'] = "/var/vsites/%s/project" % self.appName
         self.meta.save()
         #
-        # Create an entry for this web site in /etc/hosts
+        # create the container directory (vsitesdir)
+        #
+        os.mkdir(self.vsitesdir())
+        #
+        # create the vhost conf file (site.conf) in vsitesdir:
+        #
+        apacheconf = "%s/site.conf" % self.vsitesdir()
+        with open(apacheconf, "w") as f:
+            f.write((""
+                     + "<VirtualHost *:80>\n"
+                     + "    DocumentRoot %s/html\n"
+                     + "    ServerName %s\n"
+                     + "    ErrorLog logs/%s-error_log\n"
+                     + "    CustomLog logs/%s-access_log common\n"
+                     + "    <Directory %s/html>\n"
+                     + "      AllowOverride All\n"
+                     + "    </Directory>\n"
+                     + "</VirtualHost>\n") % (self.projectdir(), self.appName, self.appName,
+                                              self.appName, self.projectdir()))
+        #
+        # create a symlink to the apache conf file from /var/vsites/conf
+        #
+        apacheconf_symlink = "/var/vsites/conf/%s.conf" % self.appName
+        if os.path.lexists(apacheconf_symlink):
+            os.remove(apacheconf_symlink)
+        os.symlink(apacheconf, apacheconf_symlink)
+        #
+        # Create an entry for this vhost sitename in /etc/hosts
         #
         EtcHoster(self.appName).add_line()
 
     def delete(self):
         """Deletes an Apache container"""
         # delete the vsites dir for the app
-        vsitesdir = "/var/vsites/%s" % self.appName
-        if os.path.exists(vsitesdir):
-            rmtree(vsitesdir)
+        if os.path.exists(self.vsitesdir()):
+            rmtree(self.vsitesdir())
         # delete the apache conf symlink
         apacheconf_symlink = "/var/vsites/conf/%s.conf" % self.appName
         if os.path.lexists(apacheconf_symlink):
             os.remove(apacheconf_symlink)
             ApacheContainer.restart_apache()
+        # remove entry for this vhost sitename from /etc/hosts
         EtcHoster(self.appName).remove_lines()
         # delete the nappl metadata dir
         super(ApacheContainer, self).delete()
 
+    def vsitesdir(self):
+        return "/var/vsites/%s" % self.appName
+
+    def projectdir(self):
+        return "/var/vsites/%s/project" % self.appName
+
     def init(self, gitmessage=None):
-        """Populate an Apache container with an htmldir, a placeholder index.html file,
-        an initial site.conf file, and initialize it as a new git repo."""
-        # create the application directory (vsitesdir), if it does not yet exist
-        vsitesdir = "/var/vsites/%s" % self.appName
-        if not os.path.exists(vsitesdir):
-            os.mkdir(vsitesdir)
-        # create the html subdir, if it does not yet exist
-        htmldir = "%s/html" % vsitesdir
-        if not os.path.exists(htmldir):
-            os.mkdir(htmldir)
-            # create the index.html file, if it does not exist
-            indexhtml = "%s/index.html" % htmldir
-            if not os.path.exists(indexhtml):
-                with open(indexhtml, "w") as f:
-                    f.write(self.appName)
-        # write the apache conf file for the application
-        apacheconf = "%s/site.conf" % vsitesdir
-        if not os.path.exists(apacheconf):
-            with open(apacheconf, "w") as f:
-                f.write((""
-                         + "<VirtualHost *:80>\n"
-                         + "    DocumentRoot %s/html\n"
-                         + "    ServerName %s\n"
-                         + "    ErrorLog logs/%s-error_log\n"
-                         + "    CustomLog logs/%s-access_log common\n"
-                         + "    <Directory %s/html>\n"
-                         + "      AllowOverride All\n"
-                         + "    </Directory>\n"
-                         + "</VirtualHost>\n") % (vsitesdir, self.appName, self.appName,
-                                                  self.appName, vsitesdir))
+        """This method does two things: (1) create a new `project` subdir for an apache
+        container, populating it with a new apache project, and (2) initialize a git repo
+        in that directory.  If the container already contains a `project` subdir, step (1)
+        is skipped; this allows subclasses to implement this method to create their own
+        project subdir contents, then call this method to initialize the git repo.  The optional
+        `gitmessage` argument is appended to the initial git commit log message."""
+        # create the project subdir, if it does not yet exist
+        if not os.path.exists(self.projectdir()):
+            os.mkdir(self.projectdir())
+            # create the html subdir, if it does not yet exist
+            htmldir = "%s/html" % self.projectdir()
+            if not os.path.exists(htmldir):
+                os.mkdir(htmldir)
+                # create the index.html file, if it does not exist
+                indexhtml = "%s/index.html" % htmldir
+                if not os.path.exists(indexhtml):
+                    with open(indexhtml, "w") as f:
+                        f.write(self.appName)
         # initialize a git repo for the application
-        with open("%s/.gitignore" % vsitesdir, "w") as f:
+        with open("%s/.gitignore" % self.projectdir(), "w") as f:
             f.write("*~\n")
         if gitmessage is None:
             gitmessage = "initial nappl setup"
         else:
             gitmessage = "initial nappl setup (%s)" % gitmessage
-        os.system("cd %s ; git init -q ; git add . ; git commit -q -m '%s'" % (vsitesdir, gitmessage.replace("'", "\\'")))
+        os.system("cd %s ; git init -q ; git add . ; git commit -q -m '%s'" % (self.projectdir(), gitmessage.replace("'", "\\'")))
         self.makeDeployable()
-        self.install()
+        ApacheContainer.restart_apache()
 
     @staticmethod
     def restart_apache():
@@ -93,21 +124,7 @@ class ApacheContainer(Container):
             print "WARNING *** in order for the change(s) you have just made to completely take effect."
             print "WARNING ***"
 
-    def install(self):
-        """Create a symlink in /var/vsites/conf for an application's apache conf file"""
-        vsitesdir = "/var/vsites/%s" % self.appName
-        apacheconf = "%s/site.conf" % vsitesdir
-        if not os.path.exists(apacheconf):
-            raise Exception("Apache conf file %s not found" % apacheconf)
-        apacheconf_symlink = "/var/vsites/conf/%s.conf" % self.appName
-        if os.path.lexists(apacheconf_symlink):
-            os.remove(apacheconf_symlink)
-        os.symlink(apacheconf, apacheconf_symlink)
-        ApacheContainer.restart_apache()
-
     def git_wd_clean(self):
-        """Return True iff the application in this container has no outstanding edits since
+        """Return True iff the application project in this container has no outstanding edits since
         the last git commit."""
-        vsitesdir = "/var/vsites/%s" % self.appName
-        return git_wd_clean(vsitesdir)
-
+        return git_wd_clean(self.projectdir())

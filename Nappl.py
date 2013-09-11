@@ -41,64 +41,13 @@ def create_database(dbname):
         raise DatabaseError("There is already a mysql user named '%s'." % dbname)
     drutils.create_database_and_user(dbname, DB_SU, DB_SU_PW)
 
-def edit_drupal_settingsphp(vsitesdir, appname):
-    settingsphp = "%s/html/sites/default/settings.php" % vsitesdir
-    if not os.path.exists(settingsphp):
-        raise Exception("Drupal not correctly installed into container; missing sites/default/settings.php")
-    with open(settingsphp, "r") as f:
-        contents = f.readlines()
-    d7 = False
-    d6 = False
-    newcontents = []
-    for line in [x.strip("\n") for x in contents]:
-        if re.match(r'^\s*\$databases\s*=\s*array.*$', line):
-            d7 = True
-        elif d7 and re.search(r"'database'\s*=>\s*", line):
-            line = "      'database' => '',"
-        elif d7 and re.search(r"'username'\s*=>\s*", line):
-            line = "      'username' => '',"
-        elif d7 and re.search(r"'password'\s*=>\s*", line):
-            line = "      'password' => '',"
-        newcontents.append(line)
-    settingsphp_was_writable = True
-    if not os.access(settingsphp, os.W_OK):
-        os.system("chmod u+w %s" % settingsphp)
-        settingsphp_was_writable = False
-    if not os.access(settingsphp, os.W_OK):
-        raise Exception("Unable to modify drupal's settings.php file %s" % settingsphp)
-    with open(settingsphp, "w") as f:
-        f.write("\n".join(newcontents) + "\n")
-        if d7:
-            f.write("\nrequire_once DRUPAL_ROOT . '/../../mysql/%s/d7.php';\n" % appname)
-    if not settingsphp_was_writable:
-        os.system("chmod u-w %s" % settingsphp)
-
 def git_wd_clean(dir):
     """Return True iff there are no outstanding edits in DIR since the most recent git commit."""
     if re.search(r'working directory clean', bash_command("cd %s ; git status" % dir)):
         return True
     return False
 
-def edit_drupal_gitignore(vsitesdir):
-    gitignore = "%s/html/.gitignore" % vsitesdir
-    if not os.path.exists(gitignore):
-        raise Exception("Drupal not correctly installed into container; missing html/.gitignore")
-    with open(gitignore, "r") as f:
-        contents = f.readlines()
-    newcontents = []
-    changed = False
-    for line in [x.strip("\n") for x in contents]:
-        if re.match(r'^sites/\*/settings\*.php$', line):
-            line = '#' + line
-            changed = True
-        newcontents.append(line)
-    if changed:
-        with open(gitignore, "w") as f:
-            f.write("\n".join(newcontents) + "\n")
-
 def rmtree(path):
     if os.path.exists(path):
         os.system("chmod -R u+w %s" % path)
         shutil.rmtree(path)
-
-

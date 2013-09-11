@@ -156,11 +156,11 @@ if __name__ == "__main__":
             )
         for app in apps:
             print format % (
-                app['application']['name'],
-                app['application']['type'],
-                "OCCUPIED" if os.path.exists(app['application']['location']) else "VACANT",
-                app['application']['location'],
-                app['application']['deployrepo'] if 'deployrepo' in app['application'] else ""
+                app['container']['name'],
+                app['container']['type'],
+                "OCCUPIED" if os.path.exists(app['container']['location']) else "VACANT",
+                app['container']['location'],
+                app['container']['deployrepo'] if 'deployrepo' in app['container'] else ""
                 )
 
     elif opts.makeDeployable:
