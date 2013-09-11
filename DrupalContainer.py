@@ -291,7 +291,7 @@ class DrupalContainer(ApacheContainer):
                 line = "      'username' => '',"
             elif d7 and re.search(r"'password'\s*=>\s*", line):
                 line = "      'password' => '',"
-            elif re.search(r'^\s*$db_url\s*=\s*\S+\s*;', line):
+            elif re.search(r'^\s*\$db_url\s*=\s*\S+\s*;', line):
                 d6 = True
                 line = "$db_url = 'mysqli://xxx:xxx@localhost/xxx';"
             newcontents.append(line)
@@ -304,22 +304,27 @@ class DrupalContainer(ApacheContainer):
         with open(settingsphp, "w") as f:
             f.write("\n".join(newcontents))
             f.write("\n")
-            f.write("\nrequire_once DRUPAL_ROOT . '/../../mysql/%s.php';" % ("d7" if d7 else "d6"))
+            if d6:
+                f.write("\nrequire_once getcwd() . '/../../mysql/d6.php';")
+            else:
+                f.write("\nrequire_once DRUPAL_ROOT . '/../../mysql/d7.php';")
 
     def edit_drupal_gitignore(self):
         gitignore = "%s/html/.gitignore" % self.projectdir()
-        if not os.path.exists(gitignore):
-            raise Exception("Drupal not correctly installed into container; missing %s" % gitignore)
-        with open(gitignore, "r") as f:
-            contents = f.readlines()
-        newcontents = []
-        changed = False
-        for line in [x.strip("\n") for x in contents]:
-            if re.match(r'^sites/\*/settings\*.php$', line):
-                line = '#' + line
-                changed = True
-            newcontents.append(line)
-        if changed:
+        if os.path.exists(gitignore):
+            with open(gitignore, "r") as f:
+                contents = f.readlines()
+            newcontents = []
+            changed = False
+            for line in [x.strip("\n") for x in contents]:
+                if re.match(r'^sites/\*/settings\*.php$', line):
+                    line = '#' + line
+                    changed = True
+                newcontents.append(line)
+            if changed:
+                with open(gitignore, "w") as f:
+                    f.write("\n".join(newcontents) + "\n")
+        else:
             with open(gitignore, "w") as f:
-                f.write("\n".join(newcontents) + "\n")
-
+                f.write("sites/*/files\n")
+                f.write("sites/*/private\n")

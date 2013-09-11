@@ -28,10 +28,26 @@ class DatabaseError(Exception):
     pass
 
 def infer_database_name(name):
-    m = re.match(r'^([^\.]+).*$', name)
-    if m:
-        return m.group(1)
-    return None
+    name = re.sub(r'^www\.', '', name) # remove any "www." prefix
+    name = re.sub(r'\..*$', '', name)  # remove everything after the first "."
+    name = name[0:12]                  # truncate to the 1st 12 chars
+    # get list of existing databases
+    (DB_SU, DB_SU_PW) = drutils.get_dbsu()
+    dblist = drutils.get_databases(DB_SU, DB_SU_PW)
+    # if name is nonempty and is not in the list of databases, use it
+    if name != "" and name not in dblist:
+        return name
+    # if name is empty, use "nappl"
+    if name == "":
+        name = "nappl"
+    # find the first unused name of the form NAME-DDD:
+    i = 1
+    while True:
+        dbname = "%s-%03d" % (name, i)
+        if dbname not in dblist:
+            break
+        ++i
+    return dbname
 
 def create_database(dbname):
     (DB_SU, DB_SU_PW) = drutils.get_dbsu()
