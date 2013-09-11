@@ -66,6 +66,9 @@ if __name__ == "__main__":
     parser.add_option('--dump-local',
                       help='causes --dump-db, --dump-files, or --dump-all to write dump file(s) into current dir instead of /dumps dir',
                       dest='dumpLocal', default=False, action='store_true')
+    parser.add_option('--import-code',
+                      help="with --create-container, initialize a new application in the container by cloning a git REPO into the container's `project` subdir; requires --load-db, also works with --load-files",
+                      dest='importCode', type='string', metavar='REPO')
     (opts, args) = parser.parse_args()
 
 
@@ -83,6 +86,10 @@ if __name__ == "__main__":
             c.init()
         elif opts.importDrutilsDump:
             c.import_drutils_dump(opts.importDrutilsDump)
+        elif opts.importCode:
+            if not opts.loadDb:
+                raise Exception("--load-db must be specified along with --import-code")
+            c.importCode(opts.code, opts.loadDb, opts.loadFiles)
 
     elif opts.deleteContainer:
         appName = args[0]

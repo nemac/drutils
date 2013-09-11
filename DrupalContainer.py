@@ -1,7 +1,5 @@
 import sys, re, os, optparse, shutil, json, drutils, subprocess, time
 
-os.environ['DRUSH_DL_COMMAND'] = "tar xfz %s/drupal-7.23.tgz ; mv drupal-7.23 html" % os.getcwd()
-
 from Nappl import *
 from NapplMeta import *
 from Container import *
@@ -153,7 +151,8 @@ class DrupalContainer(ApacheContainer):
     def load_db(self, dumpfile):
         """Load a compressed sql dump file into the database for this container."""
         # 'git rev-parse --short HEAD' will print current commit sha
-        os.system("gunzip < %s | drush -r %s/html sqlc" % (dumpfile, self.projectdir()))
+        with uri_transfer(dumpfile) as local_dumpfile:
+            os.system("gunzip < %s | drush -r %s/html sqlc" % (local_dumpfile, self.projectdir()))
         print "loaded database from %s" % dumpfile
 
     def get_files_dirs(self):
@@ -181,15 +180,24 @@ class DrupalContainer(ApacheContainer):
 
     def load_files(self, dumpfile):
         """Load a compressed tar file of uploaded files into the container."""
-        if not os.path.exists(dumpfile):
-            raise Exception("Dump file %s not found" % dumpfile)
-        dirs = self.get_files_dirs()
-        for d in dirs:
-            p = "%s/html/%s" % (self.projectdir(), d)
-            if os.path.isdir(p):
-                shutil.rmtree(p)
-        os.system("cat %s | (cd %s/html ; tar xfz -)" % (dumpfile, self.projectdir()))
-        print "loaded files from %s" % dumpfile
+        with uri_transfer(dumpfile) as local_dumpfile:
+            if not os.path.exists(local_dumpfile):
+                raise Exception("Dump file %s not found" % dumpfile)
+            dirs = self.get_files_dirs()
+            for d in dirs:
+                p = "%s/html/%s" % (self.projectdir(), d)
+                if os.path.isdir(p):
+                    parent = p + "/.."
+                    parent_writable = os.access(parent, os.W_OK)
+                    if not parent_writable:
+                        os.system("chmod g+w %s" % parent)
+                        os.system("chmod u+w %s" % parent)
+                    shutil.rmtree(p)
+                    if not parent_writable:
+                        os.system("chmod g-w %s" % parent)
+                        os.system("chmod u-w %s" % parent)
+            os.system("cat %s | (cd %s/html ; tar xfz -)" % (local_dumpfile, self.projectdir()))
+            print "loaded files from %s" % dumpfile
 
     def dump_all(self, timestamp=None, dumpdir="/dumps"):
         """Write both a database dump and a files archive."""
@@ -328,3 +336,14 @@ class DrupalContainer(ApacheContainer):
             with open(gitignore, "w") as f:
                 f.write("sites/*/files\n")
                 f.write("sites/*/private\n")
+
+    def importCode(coderepo, dbdump, filesdump):
+        # clone the code into the projectdir:
+        if os.path.exists(self.projectdir()):
+            raise Exception("Container project directory %s already exists; refusing to overwrite" % self.projectdir())
+        os.system("cd %s ; git clone %s project" % (self.projectdir(), coderepo))
+        # load the dbdump file
+        self.load_db(dbdump)
+        # load files dump, if any
+        if filesdump:
+            self.load_files(filesdump)

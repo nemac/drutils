@@ -1,4 +1,4 @@
-import sys, re, os, optparse, shutil, json, drutils, subprocess, time
+import sys, re, os, optparse, shutil, json, drutils, subprocess, time, urllib2, urlparse
 
 def bash_command(command):
     """Run command in a bash subshell, and return its output as a string"""
@@ -68,9 +68,53 @@ def rmtree(path):
         os.system("chmod -R u+w %s" % path)
         shutil.rmtree(path)
 
-import urlparse, urllib2, os, re
+class uri_transfer(object):
+    """This is like uri_open() below, but returns the name of a local file to read from,
+    rather than an open file object."""
+    def __init__(self, uri):
+        self.uri = uri
+        self.tmpfile = None
+    def generate_tmpfile_name(self):
+        return "/tmp/uri_transfer_%s" % os.getpid()
+    def __enter__(self):
+        self.parsed_uri = urlparse.urlparse(self.uri)
+        if (self.parsed_uri.scheme == "http"
+            or self.parsed_uri.scheme == "https"
+            or self.parsed_uri.scheme == "ftp"):
+            res = urllib2.urlopen(self.uri)
+            self.tmpfile = self.generate_tmpfile_name()
+            with open(self.tmpfile, "w") as f:
+                for line in res.readlines():
+                    f.write(line)
+            return self.tmpfile
+        elif self.parsed_uri.scheme == "ssh":
+            m = re.match(r'^(([^@]+)@)?([^:]+)(:(\d+))?$', self.parsed_uri.netloc)
+            if not m:
+                raise Exception("cannot parse ssh url")
+            username = m.group(2)
+            host = m.group(3)
+            port = m.group(5)
+            if port is None:
+                port = 22
+            self.tmpfile = self.generate_tmpfile_name()
+            scp = "scp -q %s%s%s:%s %s" % (
+                ("-P %s " % port) if port != 22 else "",
+                (username+"@") if username else "",
+                host,
+                self.parsed_uri.path,
+                self.tmpfile
+                )
+            if os.system(scp) != 0:
+                raise Exception('transfer of file % failed' % self.uri)
+            return self.tmpfile
+        elif self.parsed_uri.scheme == "":
+            return self.uri
 
-class uri_open:
+    def __exit__(self, type, value, traceback):
+        if self.tmpfile:
+            os.remove(self.tmpfile)
+
+class uri_open(uri_transfer):
     """This class can be used in the python `with` statement to read from a file specified with
     a variety of URIs.  Usage is like this:
 
@@ -98,49 +142,10 @@ class uri_open:
 
     """
     def __init__(self, uri):
-        self.uri = uri
-        self.tmpfile = None
-    def generate_tmpfile_name(self):
-        return "/tmp/uri_open_%s.dat" % os.getpid()
+        super(uri_open, self).__init__(uri)
     def __enter__(self):
-        self.parsed_uri = urlparse.urlparse(self.uri)
-        if (self.parsed_uri.scheme == "http"
-            or self.parsed_uri.scheme == "https"
-            or self.parsed_uri.scheme == "ftp"):
-            res = urllib2.urlopen(self.uri)
-            self.tmpfile = self.generate_tmpfile_name()
-            with open(self.tmpfile, "w") as f:
-                for line in res.readlines():
-                    f.write(line)
-            self.f = open(self.tmpfile, "r")
-            return self.f
-        elif self.parsed_uri.scheme == "ssh":
-            m = re.match(r'^(([^@]+)@)?([^:]+)(:(\d+))?$', self.parsed_uri.netloc)
-            if not m:
-                raise Exception("cannot parse ssh url")
-            username = m.group(2)
-            host = m.group(3)
-            port = m.group(5)
-            if port is None:
-                port = 22
-            self.tmpfile = self.generate_tmpfile_name()
-            scp = "scp -q %s%s%s:%s %s" % (
-                ("-P %s " % port) if port != 22 else "",
-                (username+"@") if username else "",
-                host,
-                self.parsed_uri.path,
-                self.tmpfile
-                )
-            if os.system(scp) != 0:
-                raise Exception('transfer of file % failed' % self.uri)
-            self.f = open(self.tmpfile, "r")
-            return self.f
-        elif self.parsed_uri.scheme == "":
-            self.f = open(self.uri, "r")
-            return self.f
-
+        self.f = open(super(uri_open, self).__enter__(), "r")
+        return self.f
     def __exit__(self, type, value, traceback):
-        print "closing file now"
         self.f.close()
-        if self.tmpfile:
-            os.remove(self.tmpfile)
+        super(uri_open, self).__exit__(type, value, traceback)
