@@ -1,4 +1,4 @@
-import sys, re, os, optparse, shutil, json, drutils, subprocess, time, urllib2, urlparse
+import sys, re, os, optparse, shutil, json, drutils, subprocess, time, urllib2, urlparse, random
 
 def bash_command(command):
     """Run command in a bash subshell, and return its output as a string"""
@@ -72,16 +72,21 @@ def rmtree(path):
 class uri_transfer(object):
     """This is like uri_open() below, but returns the name of a local file to read from,
     rather than an open file object."""
-    def __init__(self, uri):
+    def __init__(self, uri, verbose=False):
         self.uri = uri
         self.tmpfile = None
+        self.verbose = verbose
     def generate_tmpfile_name(self):
-        return "/tmp/uri_transfer_%s" % os.getpid()
+        random.seed()
+        filename = "/tmp/uri_transfer_%s_%05d" % (os.getpid(),random.randint(100,99999))
+        return filename
     def __enter__(self):
         self.parsed_uri = urlparse.urlparse(self.uri)
         if (self.parsed_uri.scheme == "http"
             or self.parsed_uri.scheme == "https"
             or self.parsed_uri.scheme == "ftp"):
+            if self.verbose:
+                print "transferring %s" % self.uri
             res = urllib2.urlopen(self.uri)
             self.tmpfile = self.generate_tmpfile_name()
             with open(self.tmpfile, "w") as f:
@@ -105,6 +110,8 @@ class uri_transfer(object):
                 self.parsed_uri.path,
                 self.tmpfile
                 )
+            if self.verbose:
+                print "transferring %s" % self.uri
             if os.system(scp) != 0:
                 raise Exception('transfer of file % failed' % self.uri)
             return self.tmpfile
@@ -142,8 +149,8 @@ class uri_open(uri_transfer):
         * ssh://user@www.example.com:port/path/to/foo.txt
 
     """
-    def __init__(self, uri):
-        super(uri_open, self).__init__(uri)
+    def __init__(self, uri, verbose=False):
+        super(uri_open, self).__init__(uri,verbose)
     def __enter__(self):
         self.f = open(super(uri_open, self).__enter__(), "r")
         return self.f

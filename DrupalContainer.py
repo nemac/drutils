@@ -151,9 +151,9 @@ class DrupalContainer(ApacheContainer):
     def load_db(self, dumpfile):
         """Load a compressed sql dump file into the database for this container."""
         # 'git rev-parse --short HEAD' will print current commit sha
-        with uri_transfer(dumpfile) as local_dumpfile:
+        with uri_transfer(dumpfile,verbose=True) as local_dumpfile:
             os.system("gunzip < %s | drush -r %s/html sqlc" % (local_dumpfile, self.projectdir()))
-        print "loaded database from %s" % dumpfile
+            print "loaded database from %s" % dumpfile
 
     def get_files_dirs(self):
         dirs = []
@@ -180,7 +180,7 @@ class DrupalContainer(ApacheContainer):
 
     def load_files(self, dumpfile):
         """Load a compressed tar file of uploaded files into the container."""
-        with uri_transfer(dumpfile) as local_dumpfile:
+        with uri_transfer(dumpfile,verbose=True) as local_dumpfile:
             if not os.path.exists(local_dumpfile):
                 raise Exception("Dump file %s not found" % dumpfile)
             dirs = self.get_files_dirs()
@@ -341,7 +341,7 @@ class DrupalContainer(ApacheContainer):
         # clone the code into the projectdir:
         if os.path.exists(self.projectdir()):
             raise Exception("Container project directory %s already exists; refusing to overwrite" % self.projectdir())
-        os.system("cd %s ; git clone %s project" % (self.projectdir(), coderepo))
+        os.system("cd %s ; git clone %s project" % (self.vsitesdir(), coderepo))
         # load the dbdump file
         self.load_db(dbdump)
         # load files dump, if any
