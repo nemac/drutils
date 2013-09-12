@@ -11,6 +11,10 @@ from Container import *
 from ApacheContainer import *
 from DrupalContainer import *
 
+def missing_container_name_error():
+    print "error: CONTAINER_NAME argument is missing"
+    sys.exit(-1)
+
 if __name__ == "__main__":
     #
     # Process the arguments
@@ -71,10 +75,9 @@ if __name__ == "__main__":
 
 
     if opts.createContainer:
+        if len(args) < 1:
+            missing_container_name_error()
         appName = args[0]
-        if not appName:
-            print "missing CONTAINER_NAME argument"
-            sys.exit(-1)
         if opts.type == "drupal":
             c = DrupalContainer(appName)
         elif opts.type == "apache":
@@ -92,18 +95,16 @@ if __name__ == "__main__":
             c.import_code(opts.importCode, opts.loadDb, opts.loadFiles)
 
     elif opts.deleteContainer:
+        if len(args) < 1:
+            missing_container_name_error()
         appName = args[0]
-        if not appName:
-            print "missing CONTAINER_NAME argument"
-            sys.exit(-1)
         c = Container.load(appName)
         c.delete()
 
     elif opts.dumpDb:
+        if len(args) < 1:
+            missing_container_name_error()
         appName = args[0]
-        if not appName:
-            print "missing CONTAINER_NAME argument"
-            sys.exit(-1)
         c = Container.load(appName)
         if not c.git_wd_clean():
             print ("The application in container %s has edits which"
@@ -118,18 +119,16 @@ if __name__ == "__main__":
             c.dump_db()
 
     elif opts.loadDb:
+        if len(args) < 1:
+            missing_container_name_error()
         appName = args[0]
-        if not appName:
-            print "missing CONTAINER_NAME argument"
-            sys.exit(-1)
         c = Container.load(appName)
         c.load_db(opts.loadDb)
 
     elif opts.dumpFiles:
+        if len(args) < 1:
+            missing_container_name_error()
         appName = args[0]
-        if not appName:
-            print "missing CONTAINER_NAME argument"
-            sys.exit(-1)
         c = Container.load(appName)
         if not c.git_wd_clean():
             print ("The application in container %s has edits which"
@@ -145,18 +144,16 @@ if __name__ == "__main__":
 
 
     elif opts.loadFiles:
+        if len(args) < 1:
+            missing_container_name_error()
         appName = args[0]
-        if not appName:
-            print "missing CONTAINER_NAME argument"
-            sys.exit(-1)
         c = Container.load(appName)
         c.load_files(opts.loadFiles)
 
     elif opts.dumpAll:
+        if len(args) < 1:
+            missing_container_name_error()
         appName = args[0]
-        if not appName:
-            print "missing CONTAINER_NAME argument"
-            sys.exit(-1)
         c = Container.load(appName)
         if not c.git_wd_clean():
             print ("The application in container %s has edits which"
@@ -171,10 +168,9 @@ if __name__ == "__main__":
             c.dump_all()
 
     #elif opts.install:
+    #    if len(args) < 1:
+    #       missing_container_name_error()
     #    appName = args[0]
-    #    if not appName:
-    #        print "missing CONTAINER_NAME argument"
-    #        sys.exit(-1)
     #    c = Container.load(appName)
     #    c.install()
 
