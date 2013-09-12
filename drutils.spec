@@ -1,7 +1,7 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
 Version: 1.9
-Release: 23
+Release: 24
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
@@ -66,6 +66,10 @@ rm -rf %{buildroot}
 %dir /dumps
 
 %changelog
+* Thu Sep 12 2013 Mark Phillips <embeepea@git> 1.9-24
+- install now creates /dumps dir (embeepea@git)
+- puppet now modifies ssh_config to make outgoing ssh faster (embeepea@git)
+
 * Wed Sep 11 2013 Mark Phillips <embeepea@git> 1.9-23
 - verbose output when transferring files given with uri (embeepea@git)
 - use underscores, not dashes, in database names (embeepea@git)
