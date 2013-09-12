@@ -1,7 +1,7 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
 Version: 1.9
-Release: 25
+Release: 26
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
@@ -66,6 +66,15 @@ rm -rf %{buildroot}
 %dir /dumps
 
 %changelog
+* Thu Sep 12 2013 Mark Phillips <embeepea@git> 1.9-26
+- updaterepo no longer removes old drutils versions from nemac yum repo
+  (embeepea@git)
+- fix missing container name error message (embeepea@git)
+- adds drutils installation to drutils dev VM, to facilitate testing
+  (embeepea@git)
+- print error message if no container name given; print help if invoked with 0
+  options/args (embeepea@git)
+
 * Thu Sep 12 2013 Mark Phillips <embeepea@git> 1.9-25
 - DrupalContainer.import_code() makes container deployable and restarts apache
   automatically if possible (embeepea@git)
