@@ -1,7 +1,7 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
 Version: 1.9
-Release: 24
+Release: 25
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
@@ -66,6 +66,14 @@ rm -rf %{buildroot}
 %dir /dumps
 
 %changelog
+* Thu Sep 12 2013 Mark Phillips <embeepea@git> 1.9-25
+- DrupalContainer.import_code() makes container deployable and restarts apache
+  automatically if possible (embeepea@git)
+- ApacheContainer.init() skips projectdir git repo setup if on already exists
+  (embeepea@git)
+- makeDeployable() silently does nothing if deploy repo already exists
+  (embeepea@git)
+
 * Thu Sep 12 2013 Mark Phillips <embeepea@git> 1.9-24
 - install now creates /dumps dir (embeepea@git)
 - puppet now modifies ssh_config to make outgoing ssh faster (embeepea@git)
