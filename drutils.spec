@@ -36,6 +36,8 @@ drush commands.
 /bin/echo "Include /var/vsites/conf/*.conf" >> /etc/httpd/conf.d/vsites.conf
 /bin/chgrp -R nappl /var/vsites
 /bin/chmod -R g=rwsx /var/vsites
+/bin/chgrp -R nappl /dumps
+/bin/chmod -R g=rwsx /dumps
 
 %install
 rm -rf %{buildroot}
@@ -61,6 +63,7 @@ rm -rf %{buildroot}
 %dir /var/vsites/conf
 %dir /var/vsites/mysql
 %dir /deploy
+%dir /dumps
 
 %changelog
 * Wed Sep 11 2013 Mark Phillips <embeepea@git> 1.9-23

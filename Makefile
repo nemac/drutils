@@ -31,6 +31,7 @@ install:
 	mkdir -p ${root}var/nappl
 	chmod g=,o= ${root}var/nappl
 	mkdir -p ${root}deploy
+	mkdir -p ${root}dumps
 	mkdir -p ${root}var/vsites
 	mkdir -p ${root}var/vsites/conf
 	mkdir -p ${root}var/vsites/mysql
