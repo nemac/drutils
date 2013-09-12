@@ -1,7 +1,7 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
 Version: 1.9
-Release: 22
+Release: 23
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
@@ -63,6 +63,14 @@ rm -rf %{buildroot}
 %dir /deploy
 
 %changelog
+* Wed Sep 11 2013 Mark Phillips <embeepea@git> 1.9-23
+- verbose output when transferring files given with uri (embeepea@git)
+- use underscores, not dashes, in database names (embeepea@git)
+- change name of DrupalContainer import code method (embeepea@git)
+- --load-db and --load-files now accept file URIs (embeepea@git)
+- add uri_open utility class, write dumps into /dumps dir by default now
+  (embeepea@git)
+
 * Wed Sep 11 2013 Mark Phillips <embeepea@git> 1.9-22
 - better database name generation; better support for importing old d6 sites
   (embeepea@git)
