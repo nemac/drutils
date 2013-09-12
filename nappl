@@ -15,7 +15,7 @@ if __name__ == "__main__":
     #
     # Process the arguments
     #
-    parser = optparse.OptionParser('nappl [options] APPLICATION_NAME')
+    parser = optparse.OptionParser('nappl [options] CONTAINER_NAME')
     parser.add_option('--create-container',
                       help='create an application container',
                       dest='createContainer', default=False, action='store_true')
@@ -39,9 +39,9 @@ if __name__ == "__main__":
     parser.add_option('--import-drutils-dump',
                       help="with --create-container, initialize a new application in the container by loading from a DUMPFILE written by drutils's `dumpsite` command",
                       dest='importDrutilsDump', type='string', metavar='DUMPFILE')
-    parser.add_option('--install',
-                      help='install a project',
-                      dest='install', default=False, action='store_true')
+    #parser.add_option('--install',
+    #                  help='install a project',
+    #                  dest='install', default=False, action='store_true')
     parser.add_option('--list-containers',
                       help='list all application containers present',
                       dest='listContainers', default=False, action='store_true')
@@ -72,6 +72,9 @@ if __name__ == "__main__":
 
     if opts.createContainer:
         appName = args[0]
+        if not appName:
+            print "missing CONTAINER_NAME argument"
+            sys.exit(-1)
         if opts.type == "drupal":
             c = DrupalContainer(appName)
         elif opts.type == "apache":
@@ -90,11 +93,17 @@ if __name__ == "__main__":
 
     elif opts.deleteContainer:
         appName = args[0]
+        if not appName:
+            print "missing CONTAINER_NAME argument"
+            sys.exit(-1)
         c = Container.load(appName)
         c.delete()
 
     elif opts.dumpDb:
         appName = args[0]
+        if not appName:
+            print "missing CONTAINER_NAME argument"
+            sys.exit(-1)
         c = Container.load(appName)
         if not c.git_wd_clean():
             print ("The application in container %s has edits which"
@@ -110,11 +119,17 @@ if __name__ == "__main__":
 
     elif opts.loadDb:
         appName = args[0]
+        if not appName:
+            print "missing CONTAINER_NAME argument"
+            sys.exit(-1)
         c = Container.load(appName)
         c.load_db(opts.loadDb)
 
     elif opts.dumpFiles:
         appName = args[0]
+        if not appName:
+            print "missing CONTAINER_NAME argument"
+            sys.exit(-1)
         c = Container.load(appName)
         if not c.git_wd_clean():
             print ("The application in container %s has edits which"
@@ -131,11 +146,17 @@ if __name__ == "__main__":
 
     elif opts.loadFiles:
         appName = args[0]
+        if not appName:
+            print "missing CONTAINER_NAME argument"
+            sys.exit(-1)
         c = Container.load(appName)
         c.load_files(opts.loadFiles)
 
     elif opts.dumpAll:
         appName = args[0]
+        if not appName:
+            print "missing CONTAINER_NAME argument"
+            sys.exit(-1)
         c = Container.load(appName)
         if not c.git_wd_clean():
             print ("The application in container %s has edits which"
@@ -149,10 +170,13 @@ if __name__ == "__main__":
         else:
             c.dump_all()
 
-    elif opts.install:
-        appName = args[0]
-        c = Container.load(appName)
-        c.install()
+    #elif opts.install:
+    #    appName = args[0]
+    #    if not appName:
+    #        print "missing CONTAINER_NAME argument"
+    #        sys.exit(-1)
+    #    c = Container.load(appName)
+    #    c.install()
 
     elif opts.listContainers:
         apps = Container.list_containers()
@@ -185,4 +209,7 @@ if __name__ == "__main__":
         c = Container.load(appName)
         c.makeDeployable()
 
+    else:
+        parser.print_help()
+        sys.exit(-1)
 
