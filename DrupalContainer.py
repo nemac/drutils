@@ -337,7 +337,7 @@ class DrupalContainer(ApacheContainer):
                 f.write("sites/*/files\n")
                 f.write("sites/*/private\n")
 
-    def importCode(coderepo, dbdump, filesdump):
+    def import_code(self, coderepo, dbdump, filesdump):
         # clone the code into the projectdir:
         if os.path.exists(self.projectdir()):
             raise Exception("Container project directory %s already exists; refusing to overwrite" % self.projectdir())

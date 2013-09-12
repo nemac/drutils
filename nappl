@@ -39,9 +39,6 @@ if __name__ == "__main__":
     parser.add_option('--import-drutils-dump',
                       help="with --create-container, initialize a new application in the container by loading from a DUMPFILE written by drutils's `dumpsite` command",
                       dest='importDrutilsDump', type='string', metavar='DUMPFILE')
-    parser.add_option('--code',
-                      help='with --create-container, initialize the code in the container by cloning a git REPO into the `project` subdir of the container; requires --load-db option',
-                      dest='code', type='string', metavar='REPO')
     parser.add_option('--install',
                       help='install a project',
                       dest='install', default=False, action='store_true')
@@ -89,7 +86,7 @@ if __name__ == "__main__":
         elif opts.importCode:
             if not opts.loadDb:
                 raise Exception("--load-db must be specified along with --import-code")
-            c.importCode(opts.code, opts.loadDb, opts.loadFiles)
+            c.import_code(opts.importCode, opts.loadDb, opts.loadFiles)
 
     elif opts.deleteContainer:
         appName = args[0]
