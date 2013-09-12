@@ -31,6 +31,7 @@ def infer_database_name(name):
     name = re.sub(r'^www\.', '', name) # remove any "www." prefix
     name = re.sub(r'\..*$', '', name)  # remove everything after the first "."
     name = name[0:12]                  # truncate to the 1st 12 chars
+    name = re.sub(r'-', '_', name)     # replace all '-' with '_'
     # get list of existing databases
     (DB_SU, DB_SU_PW) = drutils.get_dbsu()
     dblist = drutils.get_databases(DB_SU, DB_SU_PW)
@@ -43,7 +44,7 @@ def infer_database_name(name):
     # find the first unused name of the form NAME-DDD:
     i = 1
     while True:
-        dbname = "%s-%03d" % (name, i)
+        dbname = "%s_%03d" % (name, i)
         if dbname not in dblist:
             break
         ++i
