@@ -33,6 +33,10 @@ package { 'tito':
   ensure => installed
 }
 
+package { 'drutils':
+  ensure => installed
+}
+
 file { ["/home/vagrant/rpmbuild",
         "/home/vagrant/rpmbuild/BUILD",
         "/home/vagrant/rpmbuild/RPMS",
@@ -50,6 +54,17 @@ file { "/home/vagrant/.rpmmacros" :
   owner  => "vagrant",
   group  => "vagrant",
 }
+
+exec { 'vagrant-user-in-git-goup':
+  require => Package['drutils'],
+  command => '/etc/puppet/files/assets/util/add_user_to_group vagrant git' 
+}
+
+exec { 'vagrant-user-in-nappl-goup':
+  require => Package['drutils'],
+  command => '/etc/puppet/files/assets/util/add_user_to_group vagrant nappl' 
+}
+
 
 ### exec { disable_selinux_sysconfig:
 ###     command => '/bin/sed -i "s@^\(SELINUX=\).*@\1disabled@" /etc/selinux/config',

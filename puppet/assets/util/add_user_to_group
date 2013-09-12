@@ -1,0 +1,43 @@
+#! /usr/bin/python
+
+# usage:
+#
+#   add_user_to_group USER GROUP
+
+# utility script to add the USER user to the GROUP group, if there is
+# a user named USER and a group named GROUP, and user is not already a
+# member of that group.
+
+# this script always exits with an exit status of 0 (unless it was
+# invoked with the wrong number of arguments), to keep puppet happy
+
+import sys, os, re, subprocess
+
+if len(sys.argv) != 3:
+    print "usage: add_user_to_group USER GROUP"
+    sys.exit(-1)
+
+USER  = sys.argv[1]
+GROUP = sys.argv[2]
+
+def bash_command(command):
+    """Run command in a bash subshell, and return its output as a string"""
+    return subprocess.Popen(['/bin/bash', '-c', command],
+                            stdout=subprocess.PIPE).communicate()[0].strip()
+
+# if USER doesn't exist, exit
+if bash_command("/usr/bin/getent passwd %s" % USER) == "":
+    sys.exit(0)
+
+# if GROUP doesn't exist, exit
+if bash_command("/usr/bin/getent group %s" % GROUP) == "":
+    sys.exit(0)
+
+# if USER is already in GROUP, exit
+if bash_command("/usr/bin/getent group %s | grep %s" % (GROUP,USER)) != "":
+    sys.exit(0)
+
+cmd  = "/usr/sbin/usermod -a -G %s %s" % (GROUP,USER)
+os.system(cmd)
+
+sys.exit(0)
