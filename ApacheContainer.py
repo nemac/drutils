@@ -82,12 +82,23 @@ class ApacheContainer(Container):
         return "/var/vsites/%s/project" % self.appName
 
     def init(self, gitmessage=None):
-        """This method does two things: (1) create a new `project` subdir for an apache
-        container, populating it with a new apache project, and (2) initialize a git repo
-        in that directory.  If the container already contains a `project` subdir, step (1)
-        is skipped; this allows subclasses to implement this method to create their own
-        project subdir contents, then call this method to initialize the git repo.  The optional
-        `gitmessage` argument is appended to the initial git commit log message."""
+        """Initialize a container for an apache application.  This involves the
+        following:
+        
+        * create a new `project` subdir for an apache container, populating
+          it with a new apache project
+        * initialize a git repo in the `project` subdir
+        * make the container deployable (set up /deploy repo for it)
+        * restart apache (if the current user has permission to do so)
+        
+        Each of the above items is only done if it needs to be -- i.e. any
+        step that is already done is skipped.  This allows subclasses to
+        implement this method to initialize their own project subdir, then
+        call this method to do everything else.
+        
+        The optional `gitmessage` argument is appended to the initial git
+        commit log message when a git repo is being initialized.  This
+        argument is ignored if the git repo already exists."""
         # create the project subdir, if it does not yet exist
         if not os.path.exists(self.projectdir()):
             os.mkdir(self.projectdir())
@@ -100,14 +111,15 @@ class ApacheContainer(Container):
                 if not os.path.exists(indexhtml):
                     with open(indexhtml, "w") as f:
                         f.write(self.appName)
-        # initialize a git repo for the application
-        with open("%s/.gitignore" % self.projectdir(), "w") as f:
-            f.write("*~\n")
-        if gitmessage is None:
-            gitmessage = "initial nappl setup"
-        else:
-            gitmessage = "initial nappl setup (%s)" % gitmessage
-        os.system("cd %s ; git init -q ; git add . ; git commit -q -m '%s'" % (self.projectdir(), gitmessage.replace("'", "\\'")))
+        # initialize a git repo for the application, if there isn't one already
+        if not os.path.exists("%s/.git" % self.projectdir()):
+            with open("%s/.gitignore" % self.projectdir(), "w") as f:
+                f.write("*~\n")
+            if gitmessage is None:
+                gitmessage = "initial nappl setup"
+            else:
+                gitmessage = "initial nappl setup (%s)" % gitmessage
+            os.system("cd %s ; git init -q ; git add . ; git commit -q -m '%s'" % (self.projectdir(), gitmessage.replace("'", "\\'")))
         self.makeDeployable()
         ApacheContainer.restart_apache()
 
