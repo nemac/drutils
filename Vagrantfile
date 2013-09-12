@@ -11,6 +11,7 @@ Vagrant.configure("2") do |config|
   config.vm.box_url = "http://dev.nemac.org/boxes/CentOS-6.4-base.box"
 
   config.vm.synced_folder ".", "/vagrant"
+  config.vm.synced_folder "puppet", "/etc/puppet/files"
 
   # Use shell provisioner to install puppet yum repo, puppet, epel repo:
   config.vm.provision :shell, :inline => <<-HEREDOC
