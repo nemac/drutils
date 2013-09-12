@@ -347,3 +347,5 @@ class DrupalContainer(ApacheContainer):
         # load files dump, if any
         if filesdump:
             self.load_files(filesdump)
+        # initialize the apache container
+        super(DrupalContainer, self).init()
