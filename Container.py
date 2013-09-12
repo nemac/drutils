@@ -37,6 +37,9 @@ class Container(object):
         if os.path.exists(self.meta.dir):
             rmtree(self.meta.dir)
 
+    def deployrepo(self):
+        return "/deploy/" + self.appName + ".git"
+
     def makeDeployable(self):
         """Create a /deploy repo for a container."""
         appdir = self.meta.data['container']['location']
@@ -44,29 +47,32 @@ class Container(object):
             raise Exception(("Cannot make deployable; container directory %s does not exist or is not"
                             + " set up as a git project.") % appdir)
         #
-        # Create the deploy repo, if it does not yet exist
+        # If the deployrepo already exists, don't do anything
         #
-	deployrepo = "/deploy/" + self.appName + ".git"
-        if not os.path.exists(deployrepo):
-            # create the deploy repo dir
-            os.system("mkdir %s" % deployrepo)
-            # initialize the deploy repo dir as a bare git repo
-            os.system("cd %s ; git init -q --bare" % deployrepo)
-            # push the current app repo to the deploy repo
-            os.system("cd %s ; git push -q %s master" % (appdir,deployrepo))
+        if os.path.exists(self.deployrepo()):
+            return
+        #
+        # Create the deploy repo
+        #
+        # create the deploy repo dir
+        os.system("mkdir %s" % self.deployrepo())
+        # initialize the deploy repo dir as a bare git repo
+        os.system("cd %s ; git init -q --bare" % self.deployrepo())
+        # push the current app repo to the deploy repo
+        os.system("cd %s ; git push -q %s master" % (appdir,self.deployrepo()))
         #
 	# Add the depoy repo as a remote for the application repo, if the
         # app repo does not already have a remote called 'deploy':
         #
         if bash_command("cd %s ; git remote | grep deploy" % appdir) == "":
-            os.system("cd %s ; git remote add deploy %s" % (appdir, deployrepo))
+            os.system("cd %s ; git remote add deploy %s" % (appdir, self.deployrepo()))
 
         #
         # Install the post-update hook to cause the application dir/repo to automatically
         # pull any changes committed to the deployment repo.  This overwrites any
         # existing post-update hook.
         #
-        with open("%s/hooks/post-update" % deployrepo, "w") as f:
+        with open("%s/hooks/post-update" % self.deployrepo(), "w") as f:
             f.write("""\
 #!/usr/bin/python
 
@@ -82,11 +88,11 @@ if os.path.exists("%(APPDIR)s"):
 """
                     % { 'APPDIR'  : appdir,
                         'APPNAME' : self.appName })
-        os.system("chmod +x %s/hooks/post-update" % deployrepo)
+        os.system("chmod +x %s/hooks/post-update" % self.deployrepo())
         #
         # Add deploy repo info to container metadata
         #
-        self.meta.data['container']['deployrepo'] = deployrepo
+        self.meta.data['container']['deployrepo'] = self.deployrepo()
         self.meta.save()
 
     @staticmethod
