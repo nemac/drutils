@@ -1,0 +1,45 @@
+#! /usr/bin/python
+
+# usage:
+#
+#   create_user USER PUBLIC_SSH_KEY_FILE
+
+# utility script to create a new user who can login with the given
+# public ssh key
+
+import sys, os, re, subprocess
+
+if len(sys.argv) != 3:
+    print "usage: add_user_to_group USER GROUP"
+    sys.exit(-1)
+
+USER    = sys.argv[1]
+KEYFILE = sys.argv[2]
+
+def bash_command(command):
+    """Run command in a bash subshell, and return its output as a string"""
+    return subprocess.Popen(['/bin/bash', '-c', command],
+                            stdout=subprocess.PIPE).communicate()[0].strip()
+
+# if USER already exists, exit
+if bash_command("/usr/bin/getent passwd %s" % USER) != "":
+    print "user %s already exists" % USER
+    sys.exit(-1)
+
+# if there is already a group named USER, exit
+if bash_command("/usr/bin/getent group %s" % USER) != "":
+    print "a group named '%s' already exists" % USER
+    sys.exit(-1)
+
+# if KEYFILE doesn't exist, exit
+if not os.path.exists(KEYFILE):
+    print "key file %s not found" % KEYFILE
+    sys.exit(-1)
+
+os.system("/usr/sbin/useradd -m -U %s" % USER)
+os.system("/bin/mkdir /home/%s/.ssh" % USER)
+os.system("/bin/chown %s.%s /home/%s/.ssh" % (USER,USER,USER))
+os.system("/bin/chmod g=,o= /home/%s/.ssh" % USER)
+os.system("/bin/touch /home/%s/.ssh/authorized_keys" % USER)
+os.system("/bin/chmod g=r,o=r /home/%s/.ssh/authorized_keys" % USER)
+os.system("/bin/cat %s >> /home/%s/.ssh/authorized_keys" % (KEYFILE,USER))

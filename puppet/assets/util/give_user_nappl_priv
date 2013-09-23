@@ -1,0 +1,32 @@
+#! /usr/bin/python
+
+# usage:
+#
+#   nappl_user USER
+
+# utility script to give USER the ability to create nappl containers
+
+import sys, os, re, subprocess
+
+if len(sys.argv) != 2:
+    print "usage: give_user_nappl_privs USER"
+    sys.exit(-1)
+
+USER    = sys.argv[1]
+
+def bash_command(command):
+    """Run command in a bash subshell, and return its output as a string"""
+    return subprocess.Popen(['/bin/bash', '-c', command],
+                            stdout=subprocess.PIPE).communicate()[0].strip()
+
+# if USER does not exist, exit
+if bash_command("/usr/bin/getent passwd %s" % USER) == "":
+    print "user %s does not exist" % USER
+    sys.exit(-1)
+
+if os.path.exists("/home/%s/.my.cnf" % USER) and (bash_command("/usr/bin/getent nappl | grep %s" % USER) != ""):
+    print "user %s already appears to have nappl privs" % USER
+    sys.exit(-1)
+
+os.system("/usr/sbin/usermod -a -G nappl %s" % USER)
+os.system("/bin/cp /root/.my.cnf /home/%s ; chown %s.%s /home/%s/.my.cnf" % (USER,USER,USER,USER))

@@ -1,0 +1,33 @@
+#! /usr/bin/python
+
+# usage:
+#
+#   give_user_mysql_root_access USER
+
+# utility script to copy /root/.my.conf to USER's home dir,
+# if that user exists
+
+# this script always exits with an exit status of 0 (unless it was
+# invoked with the wrong number of arguments), to keep puppet happy
+
+import sys, os, re, subprocess
+
+if len(sys.argv) != 2:
+    print "give_user_mysql_root_access USER"
+    sys.exit(-1)
+
+USER  = sys.argv[1]
+
+def bash_command(command):
+    """Run command in a bash subshell, and return its output as a string"""
+    return subprocess.Popen(['/bin/bash', '-c', command],
+                            stdout=subprocess.PIPE).communicate()[0].strip()
+
+# if USER doesn't exist, exit
+if bash_command("/usr/bin/getent passwd %s" % USER) == "":
+    sys.exit(0)
+
+os.system("/bin/cp /root/.my.cnf /home/%s" % USER)
+os.system("/bin/chown %s.%s /home/%s/.my.cnf" % (USER,USER,USER))
+
+sys.exit(0)

@@ -1,0 +1,27 @@
+#! /usr/bin/python
+
+# usage:
+#
+#   nappl_user USER
+
+# utility script to give USER the ability to create nappl containers
+
+import sys, os, re, subprocess
+
+if len(sys.argv) != 2:
+    print "usage: give_user_sudoer_priv USER"
+    sys.exit(-1)
+
+USER    = sys.argv[1]
+
+def bash_command(command):
+    """Run command in a bash subshell, and return its output as a string"""
+    return subprocess.Popen(['/bin/bash', '-c', command],
+                            stdout=subprocess.PIPE).communicate()[0].strip()
+
+# if USER does not exist, exit
+if bash_command("/usr/bin/getent passwd %s" % USER) == "":
+    print "user %s does not exist" % USER
+    sys.exit(-1)
+
+os.system("/usr/sbin/usermod -a -G admin %s" % USER)

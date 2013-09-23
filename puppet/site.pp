@@ -1,25 +1,5 @@
-package { 'emacs-nox':
-  ensure => installed
-}
-
-exec { 'set-hostname':
-    command => '/bin/sed -i "s/HOSTNAME=.*/HOSTNAME=drutils-dev/" /etc/sysconfig/network',
-    unless  => '/bin/grep -q "HOSTNAME=drutils-dev" /etc/sysconfig/network',
-}
-
-exec { 'etc-hosts':
-    command => '/bin/echo "127.0.0.1 drutils-dev" > /etc/hosts',
-    unless  => '/bin/grep -q "127.0.0.1 drutils-dev" /etc/hosts',
-}
-
-file { "/etc/ssh/ssh_config" :
-  ensure => present,
-  source => "/etc/puppet/files/assets/ssh/ssh_config"
-}
-
-package { 'git':
-  ensure => installed
-}
+$server_name = "drutils-dev"
+$mysql_root_password = "drutils"
 
 package { 'rpm-build':
   ensure => installed
@@ -30,10 +10,6 @@ package { 'redhat-rpm-config':
 }
 
 package { 'tito':
-  ensure => installed
-}
-
-package { 'drutils':
   ensure => installed
 }
 
@@ -55,243 +31,167 @@ file { "/home/vagrant/.rpmmacros" :
   group  => "vagrant",
 }
 
-exec { 'vagrant-user-in-git-goup':
-  require => Package['drutils'],
-  command => '/etc/puppet/files/assets/util/add_user_to_group vagrant git' 
+exec { disable_selinux_sysconfig:
+    command => '/bin/sed -i "s@^\(SELINUX=\).*@\1disabled@" /etc/selinux/config',
+    unless  => '/bin/grep -q "SELINUX=disabled" /etc/selinux/config',
 }
 
-exec { 'vagrant-user-in-nappl-goup':
-  require => Package['drutils'],
-  command => '/etc/puppet/files/assets/util/add_user_to_group vagrant nappl' 
+exec { 'set-hostname':
+    command => "/bin/sed -i 's/HOSTNAME=.*/HOSTNAME=${server_name}/' /etc/sysconfig/network",
+    unless  => "/bin/grep -q 'HOSTNAME=${server_name}' /etc/sysconfig/network",
 }
 
+exec { 'etc-hosts':
+    command => "/bin/echo '127.0.0.1 ${server_name}' >> /etc/hosts",
+    unless  => "/bin/grep -q '127.0.0.1 ${server_name}' /etc/hosts",
+}
 
-### exec { disable_selinux_sysconfig:
-###     command => '/bin/sed -i "s@^\(SELINUX=\).*@\1disabled@" /etc/selinux/config',
-###     unless  => '/bin/grep -q "SELINUX=disabled" /etc/selinux/config',
-### }
-### 
-### exec { 'set-hostname':
-###     command => '/bin/sed -i "s/HOSTNAME=.*/HOSTNAME=cloud1/" /etc/sysconfig/network',
-###     unless  => '/bin/grep -q "HOSTNAME=cloud1" /etc/sysconfig/network',
-### }
-### 
-### package { 'man':
-###   ensure => installed
-### }
-### 
-### package { 'wget':
-###   ensure => installed
-### }
-### 
-### package { 'git':
-###   ensure => installed
-### }
-### 
-### class apache-server {
-### 
-###   package { 'httpd':
-###     ensure => 'present'
-###   }
-### 
-###   service { 'httpd':
-###     require => Package['httpd'],
-###     ensure => running,            # this makes sure httpd is running now
-###     enable => true                # this make sure httpd starts on each boot
-###   }
-### 
-###   service { 'iptables':
-###     ensure => stopped,
-###     enable => false
-###   }
-### 
-###   service { 'ip6tables':
-###     ensure => stopped,
-###     enable => false
-###   }
-### 
-### }
-### 
-### class git-server {
-### 
-###   group { "git":
-###           ensure => present,
-###           gid => 721
-###   }
-### 
-###   user { "git":
-###           ensure => present,
-###           uid => 721,
-###           gid => "git",
-###           require => Group["git"]
-###   }
-### 
-###   file { "/prod":
-###     require => User["git"],
-###     ensure => directory,
-###     owner  => "git",
-###     group  => "git",
-###     mode => 0755
-###   }
-### 
-###   file { "/git":
-###     require => User["git"],
-###     ensure => directory,
-###     owner  => "git",
-###     group  => "git",
-###     mode => 0755
-###   }
-### 
-###   file { "/home/git":
-###     ensure => directory,
-###     owner  => "git",
-###     group  => "git",
-###     mode => 0755
-###   }
-### 
-###   file { "/home/git/.ssh":
-###     require => File["/home/git"],
-###     ensure => directory,
-###     owner  => "git",
-###     group  => "git",
-###     mode => 0700
-###   }
-### 
-###   file { "/home/git/.ssh/authorized_keys":
-###     require => File["/home/git/.ssh"],
-###     ensure => present,
-###     owner  => "git",
-###     group  => "git",
-###     mode => 0644
-###   }
-### 
-### }
-### 
-### class apache-vsites-server {
-### 
-###   class { "apache-server": }
-###   
-###   file { ["/var/vsites", "/var/vsites/conf"] :
-###     require => Class["git-server"],
-###     ensure => directory,
-###     owner  => "git",
-###     group  => "git",
-###     mode => 0755
-###   }
-### 
-###   file { "/etc/httpd/conf.d/vsites.conf" :
-###     require => Class["apache-server"],
-###     ensure => present,
-### content => "ServerName ${hostname}:80
-### NameVirtualHost *:80
-### Include /var/vsites/conf/*.conf
-### "
-###   }
-### 
-###   file { "/usr/local/bin/makeproj":
-###     ensure => present,
-###     source => "puppet:///files/assets/vsites/makeproj",
-###     mode => 0755
-###   }
-### 
-### }
-### 
-### class { "git-server" : }
-### class { "apache-vsites-server" : }
-### 
-### import 'assets/mysql/password.pp'
-### 
-### class { 'mysql::server':
-###   config_hash => { 'root_password' => $mysql_root_password }
-### }
-### 
-### class { 'mysql::php': }
-### 
-### exec { 'secure-mysql-server' :
-###     require => Class["mysql::server"],
-###     command => '/usr/bin/mysql --defaults-extra-file=/root/.my.cnf --force mysql < /etc/puppet/files/assets/mysql/secure.sql'
-### }
-### 
-### 
-### class drutils-server {
-### 
-###   package { 'drutils':
-###     ensure => installed
-###   }
-### 
-###   file { ["/var/drutils", "/var/drutils/mysql"] :
-###     ensure => directory,
-###     owner  => "root",
-###     group  => "root",
-###     mode => 0700
-###   }
-### 
-### }
-### 
-### class { 'drutils-server': }
-### 
-### ########################################################################
-### 
-### ###   #                  www.billy.org   puppet:///files/www.billy.org.conf
-### ###   define line($file, $line, $ensure = 'present') {
-### ###       case $ensure {
-### ###           default : { err ( "unknown ensure value ${ensure}" ) }
-### ###           present: {
-### ###               exec { "/bin/echo '${line}' >> '${file}'":
-### ###                   unless => "/bin/grep -qFx '${line}' '${file}'"
-### ###               }
-### ###           }
-### ###           absent: {
-### ###               exec { "/bin/grep -vFx '${line}' '${file}' | /usr/bin/tee '${file}' > /dev/null 2>&1":
-### ###                 onlyif => "/bin/grep -qFx '${line}' '${file}'"
-### ###               }
-### ###           }
-### ###       }
-### ###   }
-### ###   
-### ###   class apache-vhost($vhost_name,    $vhost_source) {
-### ###   
-### ###     line { "/etc/hosts-${vhost_name}" :
-### ###       file => '/etc/hosts',
-### ###       line => "127.0.0.1    ${vhost_name}"
-### ###     }
-### ###   
-### ###     file { "/var/${vhost_name}" :
-### ###       ensure => directory
-### ###     }
-### ###   
-### ###   #  file { "/var/${vhost_name}/html" :
-### ###   #    require => File["/var/${vhost_name}"],
-### ###   #    ensure => directory
-### ###   #  }
-### ###   
-### ###     file { "/etc/httpd/conf.d/${vhost_name}.conf" :
-### ###       require => [ Package['httpd'], Line["/etc/hosts-${vhost_name}"] ],
-### ###       ensure  => file,
-### ###       source  => $vhost_source
-### ###     }
-### ###   
-### ###   }
-### ###   
-### ###   
-### ###   class apache-vhost-git($vhost_name, $vhost_source, $git_source) {
-### ###   
-### ###     class { "apache-vhost" :
-### ###       vhost_name   => $vhost_name,
-### ###       vhost_source => $vhost_source
-### ###     }
-### ###   
-### ###     package { "git" :
-### ###       ensure => present
-### ###     }
-### ###   
-### ###     vcsrepo { $vhost_name:
-### ###       require  => Package['git'],
-### ###   #   require  => apache-vhost[$vhost_name],
-### ###       path     => "/var/www.billy.org/html",
-### ###       ensure   => present,
-### ###       provider => git,
-### ###       source   => $git_source
-### ###     }
-### ###   
-### ###   }
+file { "/etc/ssh/ssh_config" :
+  ensure => present,
+  source => "/etc/puppet/files/assets/ssh/ssh_config",
+  owner   => "root",
+  group   => "root"
+}
+
+package { 'emacs-nox':
+  ensure => installed
+}
+
+package { 'man':
+  ensure => installed
+}
+
+package { 'make':
+  ensure => installed
+}
+
+package { 'wget':
+  ensure => installed
+}
+
+package { 'git':
+  ensure => installed
+}
+
+class apache-server {
+
+  package { 'httpd':
+    ensure => 'present'
+  }
+
+  service { 'httpd':
+    require => Package['httpd'],
+    ensure => running,            # this makes sure httpd is running now
+    enable => true                # this make sure httpd starts on each boot
+  }
+
+  service { 'iptables':
+    ensure => stopped,
+    enable => false
+  }
+
+  service { 'ip6tables':
+    ensure => stopped,
+    enable => false
+  }
+
+}
+
+class nappl-server {
+
+  file { "/home/git/.ssh":
+    require => Package['drutils'],
+    ensure  => directory,
+    owner   => "git",
+    group   => "git",
+    mode    => 0700
+  }  
+
+  file { "/home/git/.ssh/authorized_keys":
+    require => File['/home/git/.ssh'],
+    ensure  => present,
+    owner   => "git",
+    group   => "git",
+    mode    => 0600
+  }
+
+  group { "admin" :
+    ensure => present,
+    system => true
+  }
+  exec { "admin-group-can-sudo":
+    require => Group['admin'],
+    command => '/bin/chmod u+w /etc/sudoers ; echo "%admin ALL=NOPASSWD: ALL" >> /etc/sudoers ; /bin/chmod u-w /etc/sudoers',
+    unless  => '/bin/grep -q "%admin ALL=NOPASSWD: ALL" /etc/sudoers'
+  }
+
+#  group { "sudoers" :
+#    ensure => present,
+#    system => true
+#  }
+#  file { "/etc/sudoers.d/sudoers_group":
+#    ensure => present,
+#    content => "%sudoers        ALL=(ALL)       NOPASSWD: ALL",
+#    owner => root,
+#    group => root,
+#    mode => 0440
+#  }
+
+  exec { 'vagrant-user-in-git-goup':
+    require => Package['drutils'],
+    command => '/etc/puppet/files/assets/util/add_user_to_group vagrant git' 
+  }
+  exec { 'vagrant-user-in-nappl-goup':
+    require => Package['drutils'],
+    command => '/etc/puppet/files/assets/util/add_user_to_group vagrant nappl' 
+  }
+  file { '/etc/hosts':
+    ensure => present,
+    group => nappl,
+    mode => 0664
+  }
+  exec { 'vagrant-user-has-mysql-root-access':
+    require => Class["mysql::server"],
+    command => '/etc/puppet/files/assets/util/give_user_mysql_root_access vagrant'
+  }
+
+}
+
+class { "nappl-server" : }
+class { "apache-server" : }
+
+class { 'mysql::server':
+  config_hash => { 'root_password' => $mysql_root_password }
+}
+
+class { 'mysql::php': }
+
+exec { 'secure-mysql-server' :
+    require => Class["mysql::server"],
+    command => '/usr/bin/mysql --defaults-extra-file=/root/.my.cnf --force mysql < /etc/puppet/files/assets/mysql/secure.sql'
+}
+
+package { 'drutils':
+  ensure => installed
+}
+
+package { 'php':
+  ensure => installed,
+}
+
+package { 'php-gd':
+  ensure => installed,
+}
+
+package { 'php-domxml-php4-php5' :
+  ensure => installed,
+}
+
+package { 'php-pear':
+  ensure => installed
+}
+
+exec { 'install-drush' :
+    command => '/usr/bin/pear channel-discover pear.drush.org ; /usr/bin/pear install drush/drush ; cd /usr/share/pear/drush/lib ; /bin/mkdir tmp ; cd tmp ; /bin/tar xfz /etc/puppet/files/assets/drush-dependencies/Console_Table-1.1.3.tgz ; /bin/rm -f package.xml ; /bin/mv Console_Table-1.1.3 .. ; cd .. ; /bin/rm -rf tmp',
+    unless => '/usr/bin/test -f /usr/bin/drush'
+}
