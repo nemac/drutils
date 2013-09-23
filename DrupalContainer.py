@@ -134,6 +134,9 @@ class DrupalContainer(ApacheContainer):
         self.edit_drupal_settingsphp()
         # edit the new drupal's .gitignore file so that it will allow settings.php in git repo
         self.edit_drupal_gitignore()
+        # make the new uploaded files dir(s) writable by other
+        for dir in self.get_files_dirs():
+            os.system("chmod -R o+w %s/html/%s" % (self.projectdir(),dir))
         # call the parent class method to initialize the git repo
         super(DrupalContainer, self).init()
 
