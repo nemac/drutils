@@ -1,7 +1,7 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
 Version: 1.9
-Release: 26
+Release: 27
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
@@ -66,6 +66,12 @@ rm -rf %{buildroot}
 %dir /dumps
 
 %changelog
+* Mon Sep 23 2013 Mark Phillips <embeepea@git> 1.9-27
+- nappl --type now defaults to "drupal" (embeepea@git)
+- drupal installation makes sites/default/files world writable (embeepea@git)
+- add additional dependencies to puppet config for full drutils functionality
+  testing (embeepea@git)
+
 * Thu Sep 12 2013 Mark Phillips <embeepea@git> 1.9-26
 - updaterepo no longer removes old drutils versions from nemac yum repo
   (embeepea@git)
