@@ -31,8 +31,8 @@ if __name__ == "__main__":
                       dest='makeDeployable', default=False, action='store_true')
     parser.add_option('--type',
                       help='with --create-container, create a container for an application of'
-                      + ' the given TYPE; allowed types are: "drupal"',
-                      dest='type', type='string')
+                      + ' the given TYPE; allowed types are: "drupal" (default), "apache"',
+                      dest='type', type='string', default='drupal')
     parser.add_option('--dbname',
                       help='with --create-container, create a database named NAME, instead of'
                         + ' inferring it from the application name',
