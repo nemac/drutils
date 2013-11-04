@@ -1,7 +1,7 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
 Version: 1.9
-Release: 27
+Release: 28
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
@@ -66,6 +66,10 @@ rm -rf %{buildroot}
 %dir /dumps
 
 %changelog
+* Mon Nov 04 2013 Mark Phillips <embeepea@git> 1.9-28
+- temporarily change nappl to download drupal from dev.nemac.org, as workaround
+  for broken drupal.org drush download (embeepea@git)
+
 * Mon Sep 23 2013 Mark Phillips <embeepea@git> 1.9-27
 - nappl --type now defaults to "drupal" (embeepea@git)
 - drupal installation makes sites/default/files world writable (embeepea@git)
