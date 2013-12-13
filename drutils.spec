@@ -1,7 +1,7 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
 Version: 1.9
-Release: 29
+Release: 30
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
@@ -66,6 +66,9 @@ rm -rf %{buildroot}
 %dir /dumps
 
 %changelog
+* Fri Dec 13 2013 Mark Phillips <embeepea@git> 1.9-30
+- trivial edit (embeepea@git)
+
 * Fri Dec 13 2013 Mark Phillips <embeepea@git> 1.9-29
 - switch nappl back to using drush to download latest Drupal; seems to be
   working now (embeepea@git)
