@@ -5,10 +5,10 @@ sys.path.append(".") # this line gets replaced by `make install`
 
 import re, os, optparse, shutil, json
 
-#
-# temporary workaround for broken "drush dl drupal" --- download from dev.nemac.org instead
-#
-os.environ['DRUSH_DL_COMMAND'] = "wget http://dev.nemac.org/drupal/drupal.tar.gz ; tar xfz drupal.tar.gz ; rm drupal.tar.gz ; mv drupal-* html"
+### #
+### # temporary workaround for broken "drush dl drupal" --- download from dev.nemac.org instead
+### #
+### os.environ['DRUSH_DL_COMMAND'] = "wget http://dev.nemac.org/drupal/drupal.tar.gz ; tar xfz drupal.tar.gz ; rm drupal.tar.gz ; mv drupal-* html"
 
 
 from Nappl import *
