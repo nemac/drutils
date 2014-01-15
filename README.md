@@ -1,20 +1,11 @@
-Nappl / Drutils
-===============
+Nappl
+=====
 
 Nappl, which stands for 'NEMAC Application', is a program that
-aids in software application development and server deployment.
-
-This project contains the `nappl` program itself, plus the `drutils`
-utilities for managing Drupal web sites.  The `drutils` utilities
-are being phased out, and generally speaking, should not be used
-any more, except to continue managing Drupal sites that have previously
-been set up with `drutils`.  Most of the functionality of the `drutils`
-scripts has been replaced with functionality in Nappl, and new
-development should take place with Nappl.
-
-The old `drutils` README file is still available as
-[DRUTILS.md](https://github.com/nemac/drutils/blob/master/DRUTILS.md);
-consult that file for documentation for the `drutils` scripts.
+streamlines the deployment and management of code to a production
+server.  I specifically wrote it to help manage servers running
+Drupal web sites, but it can also be used to deploy and manage
+other types of applications.
 
 Application Containers
 ======================
@@ -94,9 +85,17 @@ If the `--init` option is not present, Nappl will create an empty container
 for the application, and you will later need to populate that
 container with an actual application; see "Populating a Container" below.
 
-Populating a Container
-======================
+Drutils
+=======
 
-bla bla how to populate an empty container
+*Drutils* was the name of the precursor to Nappl.  Several of the
+Drutils utilities are included in Nappl, but they are
+being phased out, and generally speaking, should not be used
+any more, except to continue managing Drupal sites that have previously
+been set up with `drutils`.  Most of the functionality of the `drutils`
+scripts has been replaced with functionality in Nappl, and new
+development should take place with Nappl.
 
-bla bla don't forget to `sudo service httpd restart`
+The old `drutils` README file is still available as
+[DRUTILS.md](https://github.com/nemac/drutils/blob/master/DRUTILS.md);
+consult that file for documentation for the `drutils` scripts.
