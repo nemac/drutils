@@ -8,7 +8,7 @@ Drupal web sites, but it can also be used to deploy and manage
 other types of applications.
 
 Application Containers
-======================
+----------------------
 
 Nappl makes use of the distinct concepts of *application* and *container*.
 An *application* is any collection of software that needs to be managed as
@@ -42,7 +42,7 @@ as creating a database and storing the database connection information
 in a place where the application can read it.)
 
 Basic Nappl Usage
-=================
+-----------------
 
 All Nappl actions are done using the `nappl` command, which takes
 various options and/or arguments to control what happens.
@@ -53,7 +53,7 @@ available application containers on the system by typing
     nappl --list-containers
 
 Creating a Container
-====================
+--------------------
 
 To create a new application container, use the `--create-container`
 option.  This option requires an additional option `--type` which
@@ -86,7 +86,7 @@ for the application, and you will later need to populate that
 container with an actual application; see "Populating a Container" below.
 
 Drutils
-=======
+-------
 
 *Drutils* was the name of the precursor to Nappl.  Several of the
 Drutils utilities are included in Nappl, but they are
