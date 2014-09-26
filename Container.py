@@ -84,6 +84,7 @@ print ""
 
 if os.path.exists("%(APPDIR)s"):
     os.system("unset GIT_DIR ; cd %(APPDIR)s ; git pull deploy master")
+    os.system("unset GIT_DIR ; cd %(APPDIR)s ; git submodule update --init --recursive")
     os.system("unset GIT_DIR ; cd %(APPDIR)s ; git update-server-info")
 """
                     % { 'APPDIR'  : appdir,
