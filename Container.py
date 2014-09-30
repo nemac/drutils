@@ -86,8 +86,8 @@ ref = re.sub(r'^.*/([^/]+)$', r'\1', sys.argv[1])
 
 if os.path.exists("%(APPDIR)s"):
     os.system("unset GIT_DIR ; cd /var/vsites/fcav2.nemac.org/project ; git pull deploy --tags")
-    os.system("unset GIT_DIR ; cd /var/vsites/fcav2.nemac.org/project ; git pull deploy %s" % ref)
-    os.system("unset GIT_DIR ; cd /var/vsites/fcav2.nemac.org/project ; git checkout %s" % ref)
+    os.system("unset GIT_DIR ; cd /var/vsites/fcav2.nemac.org/project ; git pull deploy %%s" %% ref)
+    os.system("unset GIT_DIR ; cd /var/vsites/fcav2.nemac.org/project ; git checkout %%s" %% ref)
     os.system("unset GIT_DIR ; cd /var/vsites/fcav2.nemac.org/project ; git update-server-info")
 """
                     % { 'APPDIR'  : appdir,
