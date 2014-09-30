@@ -76,7 +76,7 @@ class Container(object):
             f.write("""\
 #!/usr/bin/python
 
-import os
+import os, re
 
 print ""
 print "**** Deploying updates to %(APPDIR)s ****"
