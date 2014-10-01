@@ -82,7 +82,8 @@ print ""
 print "**** Deploying updates to %(APPDIR)s ****"
 print ""
 
-ref = re.sub(r'^.*/([^/]+)$', r'\\1', sys.argv[1])
+#ref = re.sub(r'^.*/([^/]+)$', r'\\1', sys.argv[1])
+ref = sys.argv[1]
 
 if os.path.exists("%(APPDIR)s"):
     os.system("unset GIT_DIR ; cd /var/vsites/fcav2.nemac.org/project ; git pull deploy --tags")
