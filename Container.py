@@ -82,11 +82,10 @@ print ""
 print "**** Deploying updates to %(APPDIR)s ****"
 print ""
 
-ref = sys.argv[1]
+# ref = sys.argv[1]
 
 if os.path.exists("%(APPDIR)s"):
-    os.system("unset GIT_DIR ; cd %(APPDIR)s ; git pull deploy %%s" %% ref)
-    os.system("unset GIT_DIR ; cd %(APPDIR)s ; git checkout %%s" %% ref)
+    os.system("unset GIT_DIR ; cd %(APPDIR)s ; git pull deploy master")
     os.system("unset GIT_DIR ; cd %(APPDIR)s ; git update-server-info")
 
     if os.path.exists("%(APPDIR)s/nappl-deploy-hook"):
