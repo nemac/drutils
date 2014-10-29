@@ -1,7 +1,12 @@
 #! /bin/bash
 
-ssh mbp@dev.nemac.org 'rm -f /tmp/drutils*rpm'
-scp /tmp/tito/drutils*src.rpm mbp@dev.nemac.org:/tmp
-scp /tmp/tito/noarch/drutils*noarch.rpm mbp@dev.nemac.org:/tmp
+#ssh mbp@dev.nemac.org 'rm -f /tmp/drutils*rpm'
+#scp /tmp/tito/drutils*src.rpm mbp@dev.nemac.org:/tmp
+#scp /tmp/tito/noarch/drutils*noarch.rpm mbp@dev.nemac.org:/tmp
 #ssh mbp@dev.nemac.org 'cd /var/dev.nemac.org/html/yum-repo ; rm -f ./SRPMS/*.rpm ./x86_64/RPMS/*.rpm ./i386/RPMS/*.rpm ; cp /tmp/drutils*src*rpm ./SRPMS ; cp /tmp/drutils*noarch*rpm ./x86_64/RPMS ; cp /tmp/drutils*noarch*rpm ./i386/RPMS ; ./updaterepos'
-ssh mbp@dev.nemac.org 'cd /var/dev.nemac.org/html/yum-repo ; cp /tmp/drutils*src*rpm ./SRPMS ; cp /tmp/drutils*noarch*rpm ./x86_64/RPMS ; cp /tmp/drutils*noarch*rpm ./i386/RPMS ; ./updaterepos'
+
+cp /tmp/tito/noarch/*.rpm $HOME/yum.nemac.org/html/SRPMS
+cp /tmp/tito/noarch/*.rpm $HOME/yum.nemac.org/html/x86_64/RPMS
+cp /tmp/tito/noarch/*.rpm $HOME/yum.nemac.org/html/i386/RPMS
+
+#ssh mbp@dev.nemac.org 'cd /var/dev.nemac.org/html/yum-repo ; cp /tmp/drutils*src*rpm ./SRPMS ; cp /tmp/drutils*noarch*rpm ./ ; cp /tmp/drutils*noarch*rpm ./i386/RPMS ; ./updaterepos'
