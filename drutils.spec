@@ -1,7 +1,7 @@
 Summary: Drutils - Drupal/Drush Utilities
 Name: drutils
 Version: 1.9
-Release: 42
+Release: 43
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
@@ -65,6 +65,9 @@ rm -rf %{buildroot}
 %dir /dumps
 
 %changelog
+* Wed Nov 26 2014 Mark Phillips <embeepea@git> 1.9-43
+- update vsites.conf (embeepea@git)
+
 * Wed Nov 26 2014 Mark Phillips <embeepea@git> 1.9-42
 - darn fix typo in new apache conf (embeepea@git)
 
