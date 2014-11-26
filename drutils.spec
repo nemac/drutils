@@ -47,6 +47,7 @@ rm -rf %{buildroot}
 
 %files
 /usr/lib/drutils/*.py*
+/usr/lib/drutils/generate-vsites-conf
 /usr/bin/dumpsite
 /usr/bin/loadsite
 /usr/bin/makesite
