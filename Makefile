@@ -25,6 +25,8 @@ install:
 	install -D Container.py ${libdir}/Container.py
 	install -D ApacheContainer.py ${libdir}/ApacheContainer.py
 	install -D DrupalContainer.py ${libdir}/DrupalContainer.py
+	install -D generate-vsites-conf ${libdir}/generate-vsites-conf
+	chmod a+x ${libdir}/generate-vsites-conf
 	${EDIT_LIB_DIR} < nappl > nappl.edited ; install -D -m 0755 nappl.edited ${bindir}/nappl ; /bin/rm -f nappl.edited
 	mkdir -p ${root}var/drutils/mysql
 	chmod g=,o= ${root}var/drutils/mysql

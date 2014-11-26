@@ -31,9 +31,7 @@ drush commands.
 /bin/chmod g=rwsx /var/drutils /var/drutils/mysql
 /bin/chown git.git /deploy
 /bin/chmod g=rwsx /deploy
-/bin/echo "ServerName `/bin/hostname`:80" > /etc/httpd/conf.d/vsites.conf
-/bin/echo "NameVirtualHost *:80" >> /etc/httpd/conf.d/vsites.conf
-/bin/echo "Include /var/vsites/conf/*.conf" >> /etc/httpd/conf.d/vsites.conf
+/usr/lib/drutils/generate-vsites-conf > /etc/httpd/conf.d/vsites.conf
 /bin/chgrp -R nappl /var/vsites
 /bin/chmod -R g=rwsx /var/vsites
 /bin/chgrp -R nappl /dumps

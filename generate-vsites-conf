@@ -1,0 +1,45 @@
+#! /usr/bin/perl
+
+# This script checks the version of Apache present on the machine it is run on,
+# and prints (to standard output) a snippet of Apache conf lines appropriate
+# for that version; this snippet of lines should be inserted into the Apache
+# configuration file.
+# 
+# This script is normally run as part of the nappl installation process; once
+# nappl has been installed this script is no longer used.
+
+sub get_apache_version {
+    chomp(my $V = `/usr/sbin/httpd -V | grep -i 'Server version'`);
+    $V =~ s|^.*Apache/||;
+    $V =~ s|[^.0-9].*$||;
+    return $V;
+}
+
+sub compare_version_numbers {
+    my $a = shift;
+    my $b = shift;
+    my ($a0,$a1,$a2) = split(/\./, $a);
+    my ($b0,$b1,$b2) = split(/\./, $b);
+    if ($a0 < $b0) { return -1; }
+    if ($a0 > $b0) { return  1; }
+    if ($a1 < $b1) { return -1; }
+    if ($a1 > $b1) { return  1; }
+    if ($a2 < $b2) { return -1; }
+    if ($a2 > $b2) { return  1; }
+    return 0;
+}
+
+$v = get_apache_version();
+
+chomp($servername = `/bin/hostname`);
+
+if (compare_version_numbers($v, "2.3.6") < 0) {
+    # for Apache versions prior to 2.3.6:
+    print "ServerName $servername:80\n";
+    print "NameVirtualHost *:80\n";
+    print "Include /var/vsites/conf/*.conf\n";
+} else {
+    # for Apache versions 2.3.6 and later:
+    print "ServerName $servername:80\n";
+    print "IncludeOnly /var/vsites/conf/*.conf\n";
+}
