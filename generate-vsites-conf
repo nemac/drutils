@@ -40,6 +40,9 @@ if (compare_version_numbers($v, "2.3.6") < 0) {
     print "Include /var/vsites/conf/*.conf\n";
 } else {
     # for Apache versions 2.3.6 and later:
+    print "<Directory /var/vsites>\n";
+    print "  Require all granted\n";
+    print "</Directory>\n";
     print "ServerName $servername:80\n";
     print "IncludeOptional /var/vsites/conf/*.conf\n";
 }
