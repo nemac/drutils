@@ -99,10 +99,10 @@ class DrupalContainer(ApacheContainer):
             (DB_SU, DB_SU_PW) = drutils.get_dbsu()
             drutils.drop_database(dbname, DB_SU, DB_SU_PW)
             drutils.drop_user(dbname, DB_SU, DB_SU_PW)
-            # delete the drutils mysql cnf file
-            drutils_mysql_cnf = "/var/drutils/mysql/%s.cnf" % dbname
-            if os.path.exists(drutils_mysql_cnf):
-                os.remove(drutils_mysql_cnf)
+            #drutils-delete # delete the drutils mysql cnf file
+            #drutils-delete drutils_mysql_cnf = "/var/drutils/mysql/%s.cnf" % dbname
+            #drutils-delete if os.path.exists(drutils_mysql_cnf):
+            #drutils-delete     os.remove(drutils_mysql_cnf)
         except:
             pass
         #

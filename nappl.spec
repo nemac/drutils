@@ -1,19 +1,21 @@
-Summary: Drutils - Drupal/Drush Utilities
-Name: drutils
-Version: 1.9
-Release: 43
+Summary: nappl - nemac application manager
+Name: nappl
+Version: 2.0
+Release: 0
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
-URL: http://github.com/nemac/drutils
+URL: http://github.com/nemac/nappl
 BuildArch: noarch
 BuildRoot: %{_tmppath}/%{name}-root
 Requires: httpd
+Obsoletes: drutils <= 1.9
+Conflicts: drutils <= 1.9
+Provides: drutils
 
 %description
-Drutils is a collection of scripts to make the tasks of creating, backing up, and
-restoring Drupal web sites easy.  The scripts are basically wrappers around various
-drush commands.
+Nappl is a program that streamlines the deployment and management of
+applications on a production server.
 
 %prep
 %setup
