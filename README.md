@@ -1,11 +1,9 @@
 Nappl
 =====
 
-Nappl, which stands for 'NEMAC Application', is a program that
-streamlines the deployment and management of code to a production
-server.  I specifically wrote it to help manage servers running
-Drupal web sites, but it can also be used to deploy and manage
-other types of applications.
+Nappl, which stands for 'Nemac APPLication manager', is a program that
+streamlines the deployment and management of applications on a production
+server.
 
 Application Containers
 ----------------------
@@ -97,5 +95,5 @@ scripts has been replaced with functionality in Nappl, and new
 development should take place with Nappl.
 
 The old `drutils` README file is still available as
-[DRUTILS.md](https://github.com/nemac/drutils/blob/master/DRUTILS.md);
+[DRUTILS.md](https://github.com/nemac/nappl/blob/master/DRUTILS.md);
 consult that file for documentation for the `drutils` scripts.
