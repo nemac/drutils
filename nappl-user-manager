@@ -36,10 +36,8 @@ if __name__ == "__main__":
             # If the application has a crontab file, install it
             crontab_path = "/var/vsites/" + appl['container'] + "/crontab";
             if os.path.exists(crontab_path):
-                print "installing crontab " + crontab_path
                 install_crontab(appl['username'], crontab_path)
             else:
-                print "removing crontab for " + appl['username']
                 remove_crontab(appl['username'])
 
     # Delete any linux users with uid > 10000 which are not associated with a nappl application

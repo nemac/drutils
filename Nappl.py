@@ -211,7 +211,7 @@ def user_groups(username):
                   bash_command("/usr/bin/groups %s" % username)).split(" ")
 
 def system(cmd):
-    print ">>> " + cmd
+    #print ">>> " + cmd
     return os.system(cmd)
 
 def add_user_to_group(username, groupname):
@@ -237,7 +237,7 @@ def install_crontab(username, crontab_path):
     system("crontab -u %s %s" % (username, crontab_path))
 
 def remove_crontab(username):
-    system("crontab -r -u %s 2>&1 > /dev/null" % username)
+    system("crontab -r -u %s > /dev/null 2>&1" % username)
 
 def remove_user(username):
     if user_exists(username):
