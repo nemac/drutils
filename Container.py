@@ -23,6 +23,19 @@ class Container(object):
             'name'      : self.appName
         }
         self.meta.save()
+        self.createUser()
+
+    def createUser(self):
+        if 'user' in self.meta.data:
+            return
+        if 'database' in self.meta.data and 'user' in self.meta.data['database']:
+            uname = uniqify_username("nappl_" + self.meta.data['database']['user'])
+        else:
+            uname = uniqify_username("nappl_" + shorten_name(self.meta.data['container']['name']))
+        self.meta.data['user'] = {
+            'name' : uname
+        }
+        self.meta.save()
 
     def delete(self):
         """Delete an application container.  This method deletes the container's /deploy

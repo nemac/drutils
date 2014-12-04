@@ -28,6 +28,7 @@ install:
 	install -D generate-vsites-conf ${libdir}/generate-vsites-conf
 	chmod a+x ${libdir}/generate-vsites-conf
 	${EDIT_LIB_DIR} < nappl > nappl.edited ; install -D -m 0755 nappl.edited ${bindir}/nappl ; /bin/rm -f nappl.edited
+	${EDIT_LIB_DIR} < nappl-user-manager > nappl-user-manager.edited ; install -D -m 0755 nappl-user-manager.edited ${bindir}/nappl-user-manager ; /bin/rm -f nappl-user-manager.edited
 	mkdir -p ${root}var/drutils/mysql
 	chmod g=,o= ${root}var/drutils/mysql
 	mkdir -p ${root}var/nappl

@@ -31,6 +31,9 @@ if __name__ == "__main__":
     parser.add_option('--delete-container',
                       help='delete an application container',
                       dest='deleteContainer', default=False, action='store_true')
+    parser.add_option('--create-user',
+                      help='create a nappl login user name for a container, if it does not already have one',
+                      dest='createUser', default=False, action='store_true')
     parser.add_option('--make-deployable',
                       help='make a container be deployable, by setting up a git repo at /deploy/APPNAME.git',
                       dest='makeDeployable', default=False, action='store_true')
@@ -98,6 +101,14 @@ if __name__ == "__main__":
             if not opts.loadDb:
                 raise Exception("--load-db must be specified along with --import-code")
             c.import_code(opts.importCode, opts.loadDb, opts.loadFiles)
+
+    elif opts.createUser:
+        if len(args) < 1:
+            missing_container_name_error()
+        appName = args[0]
+        c = Container.load(appName)
+        c.createUser()
+        print "user name for application '%s' is '%s'" % (appName, c.meta.data['user']['name'])
 
     elif opts.deleteContainer:
         if len(args) < 1:
@@ -181,28 +192,31 @@ if __name__ == "__main__":
 
     elif opts.listContainers:
         apps = Container.list_containers()
-        format = "%-40s  %-10s  %-10s  %-40s  %s"
+        format = "%-40s  %-10s  %-10s  %-16s %-10s  %s"
         print format % (
             "Application Name",
             "Type",
             "Occupancy",
-            "Directory",
-            "Deploy Repo",
+            "Linux User",
+            "Deployable",
+            "Directory"
             )
         print format % (
             "----------------",
             "----",
             "---------",
+            "----------",
+            "----------",
             "---------",
-            "-----------"
             )
         for app in apps:
             print format % (
                 app['container']['name'],
                 app['container']['type'],
                 "OCCUPIED" if os.path.exists(app['container']['location']) else "VACANT",
+                app['user']['name'] if 'user' in app and 'name' in app['user'] else "",
+                "YES" if 'deployrepo' in app['container'] else "",
                 app['container']['location'],
-                app['container']['deployrepo'] if 'deployrepo' in app['container'] else ""
                 )
 
     elif opts.makeDeployable:

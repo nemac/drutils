@@ -58,6 +58,7 @@ rm -rf %{buildroot}
 /usr/bin/dbdrop
 /usr/bin/dbpw
 /usr/bin/nappl
+/usr/bin/nappl-user-manager
 %dir /var/drutils/mysql
 %dir /var/nappl
 %dir /var/vsites

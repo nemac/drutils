@@ -1,0 +1,49 @@
+#! /usr/bin/python
+
+import sys
+sys.path.append(".") # this line gets replaced by `make install`
+
+import re, os, optparse, shutil, json, pwd, grp
+
+from Nappl import *
+
+if __name__ == "__main__":
+
+    # Get list of all current Linux account names
+    linux_users = pwd.getpwall()
+    linux_usernames = [u.pw_name for u in linux_users]
+
+    # Get a list of all current members of the nappl group
+    nappl_group_members = grp.getgrnam('nappl').gr_mem
+
+    # Get list of all nappl applications
+    nappl_appls = all_nappl_containers_and_usernames()
+
+    nappl_appls_having_linux_accounts = []
+
+    # For each nappl application
+    for appl in nappl_appls:
+        # If this application needs a linux account
+        if 'username' in appl:
+            nappl_appls_having_linux_accounts.append(appl['username'])
+            # If the linux account doesn't exist, create it
+            if appl['username'] not in linux_usernames:
+                uid = generate_new_uid_gid()
+                create_user(appl['username'], uid, "/var/vsites/" + appl['container'])
+            # If the linux account is not in the nappl group, add it
+            if appl['username'] not in nappl_group_members:
+                add_user_to_group(appl['username'], 'nappl')
+            # If the application has a crontab file, install it
+            crontab_path = "/var/vsites/" + appl['container'] + "/crontab";
+            if os.path.exists(crontab_path):
+                print "installing crontab " + crontab_path
+                install_crontab(appl['username'], crontab_path)
+            else:
+                print "removing crontab for " + appl['username']
+                remove_crontab(appl['username'])
+
+    # Delete any linux users with uid > 10000 which are not associated with a nappl application
+    for u in linux_users:
+        if u.pw_uid > 10000 and u.pw_name not in nappl_appls_having_linux_accounts:
+            remove_user(u.pw_name)
+            remove_crontab(u.pw_name)
