@@ -43,5 +43,5 @@ if __name__ == "__main__":
     # Delete any linux users with uid > 10000 which are not associated with a nappl application
     for u in linux_users:
         if u.pw_uid > 10000 and u.pw_name not in nappl_appls_having_linux_accounts:
-            remove_user(u.pw_name)
             remove_crontab(u.pw_name)
+            remove_user(u.pw_name)
