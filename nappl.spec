@@ -1,6 +1,6 @@
 Summary: nappl - nemac application manager
 Name: nappl
-Version: 2.3
+Version: 2.4
 Release: 1
 License: GPL
 Group: Web Development
@@ -70,6 +70,9 @@ rm -rf %{buildroot}
 %dir /dumps
 
 %changelog
+* Fri Dec 05 2014 Mark Phillips <embeepea@git> 2.4-1
+- touch cron file after installing (embeepea@git)
+
 * Fri Dec 05 2014 Mark Phillips <embeepea@git> 2.3-1
 - 
 
