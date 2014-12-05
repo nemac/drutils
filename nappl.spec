@@ -38,6 +38,7 @@ applications on a production server.
 /bin/chmod -R g=rwsx /var/vsites
 /bin/chgrp -R nappl /dumps
 /bin/chmod -R g=rwsx /dumps
+touch /etc/cron.d/nappl
 
 %install
 rm -rf %{buildroot}
