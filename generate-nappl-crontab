@@ -1,0 +1,4 @@
+#! /bin/bash
+
+echo "# Run the nappl user manager once every minute"
+echo "* * * * * /usr/bin/nappl-user-manager"

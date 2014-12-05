@@ -26,7 +26,9 @@ install:
 	install -D ApacheContainer.py ${libdir}/ApacheContainer.py
 	install -D DrupalContainer.py ${libdir}/DrupalContainer.py
 	install -D generate-vsites-conf ${libdir}/generate-vsites-conf
+	install -D generate-nappl-crontab ${libdir}/generate-nappl-crontab
 	chmod a+x ${libdir}/generate-vsites-conf
+	chmod a+x ${libdir}/generate-nappl-crontab
 	${EDIT_LIB_DIR} < nappl > nappl.edited ; install -D -m 0755 nappl.edited ${bindir}/nappl ; /bin/rm -f nappl.edited
 	${EDIT_LIB_DIR} < nappl-user-manager > nappl-user-manager.edited ; install -D -m 0755 nappl-user-manager.edited ${bindir}/nappl-user-manager ; /bin/rm -f nappl-user-manager.edited
 	mkdir -p ${root}var/drutils/mysql

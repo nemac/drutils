@@ -38,6 +38,7 @@ applications on a production server.
 /bin/chmod -R g=rwsx /var/vsites
 /bin/chgrp -R nappl /dumps
 /bin/chmod -R g=rwsx /dumps
+/usr/lib/drutils/generate-nappl-crontab > /etc/cron.d/nappl-user-manager
 
 %install
 rm -rf %{buildroot}
@@ -50,6 +51,7 @@ rm -rf %{buildroot}
 %files
 /usr/lib/drutils/*.py*
 /usr/lib/drutils/generate-vsites-conf
+/usr/lib/drutils/generate-nappl-crontab
 /usr/bin/dumpsite
 /usr/bin/loadsite
 /usr/bin/makesite
