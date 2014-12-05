@@ -1,6 +1,6 @@
 Summary: nappl - nemac application manager
 Name: nappl
-Version: 2.1
+Version: 2.2
 Release: 1
 License: GPL
 Group: Web Development
@@ -69,6 +69,9 @@ rm -rf %{buildroot}
 %dir /dumps
 
 %changelog
+* Fri Dec 05 2014 Mark Phillips <embeepea@git> 2.2-1
+- change how crontab is generated (embeepea@git)
+
 * Fri Dec 05 2014 Mark Phillips <embeepea@git> 2.1-1
 - new package built with tito
 
