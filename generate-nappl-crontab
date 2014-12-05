@@ -1,4 +1,14 @@
 #! /bin/bash
 
+# This prints, to standard output, a couple lines that will serve as
+# the crontab entry for the nappl-user-manager script which needs
+# to run regularly as part of a nappl installation.
+# 
+# This script is normally run as part of the nappl installation process
+# to generate the crontab entry; once nappl has been installed this script
+# is no longer used (because the crontab entry that it generated gets
+# saved  in a place on the system where the cron daemon will find it
+# (typicaly in /etc/cron.d)
+
 echo "# Run the nappl user manager once every minute"
 echo "* * * * * /usr/bin/nappl-user-manager"
