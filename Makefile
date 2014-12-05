@@ -38,4 +38,4 @@ install:
 	mkdir -p ${root}var/vsites
 	mkdir -p ${root}var/vsites/conf
 	mkdir -p ${root}var/vsites/mysql
-	./generate-nappl-crontab > ${root}etc/cron.d/nappl-user-manager
+	./generate-nappl-crontab ${root}

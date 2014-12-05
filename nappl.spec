@@ -59,7 +59,7 @@ rm -rf %{buildroot}
 /usr/bin/dbpw
 /usr/bin/nappl
 /usr/bin/nappl-user-manager
-/etc/cron.d/nappl-user-manager
+/etc/cron.d/nappl
 %dir /var/drutils/mysql
 %dir /var/nappl
 %dir /var/vsites

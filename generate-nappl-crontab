@@ -1,14 +1,50 @@
-#! /bin/bash
+#! /usr/bin/python
 
-# This prints, to standard output, a couple lines that will serve as
-# the crontab entry for the nappl-user-manager script which needs
-# to run regularly as part of a nappl installation.
+# usage:
+#    generate-nappl-cron ROOT
+#
+# This script creates the file {ROOT}etc/cron.d/nappl, which
+# serves as a cron file for a nappl installation.
+#
+# ROOT is passed as the single argument to this script.  Normally
+# it should be "/", which will cause this script to create
+# the file /etc/cron.d/nappl, but ROOT can be any pathname,
+# and the file etc/cron.d/nappl will be generated relative to
+# that path.
 # 
 # This script is normally run as part of the nappl installation process
 # to generate the crontab entry; once nappl has been installed this script
-# is no longer used (because the crontab entry that it generated gets
-# saved  in a place on the system where the cron daemon will find it
-# (typicaly in /etc/cron.d)
+# is no longer used.
 
-echo "# Run the nappl user manager once every minute"
-echo "* * * * * /usr/bin/nappl-user-manager"
+#etc/cron.d/nappl-user-manager
+
+import sys, os
+
+def die(message):
+    print message
+    sys.exit(-1)
+
+ROOT = sys.argv[1]
+
+if not os.path.isdir(ROOT):
+    die("Directory %s does not exist." % ROOT)
+
+etc = os.path.join(ROOT, "etc")
+
+if not os.path.isdir(etc):
+    if not os.path.exists(etc):
+        os.system("mkdir " + etc)
+    else:
+        die("%s exists and is not a directory" % etc)
+
+crond = os.path.join(etc, "cron.d")
+
+if not os.path.isdir(crond):
+    if not os.path.exists(crond):
+        os.system("mkdir " + crond)
+    else:
+        die("%s exists and is not a directory" % crond)
+
+with open(os.path.join(crond, "nappl"), 'w') as f:
+    f.write("# Run the nappl user manager once every minute\n")
+    f.write("* * * * * /usr/bin/nappl-user-manager\n")
