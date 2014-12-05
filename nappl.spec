@@ -1,7 +1,7 @@
 Summary: nappl - nemac application manager
 Name: nappl
 Version: 2.0
-Release: 0
+Release: 1
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
@@ -70,6 +70,9 @@ rm -rf %{buildroot}
 %dir /dumps
 
 %changelog
+* Fri Dec 05 2014 Mark Phillips <embeepea@git> 2.0-1
+- new package built with tito
+
 * Wed Nov 26 2014 Mark Phillips <embeepea@git> 1.9-43
 - update vsites.conf (embeepea@git)
 
