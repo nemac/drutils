@@ -1,7 +1,7 @@
 Summary: nappl - nemac application manager
 Name: nappl
 Version: 2.0
-Release: 2
+Release: 3
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
@@ -69,6 +69,9 @@ rm -rf %{buildroot}
 %dir /dumps
 
 %changelog
+* Fri Dec 05 2014 Mark Phillips <embeepea@git> 2.0-3
+- treat crontab file as a real installed file (embeepea@git)
+
 * Fri Dec 05 2014 Mark Phillips <embeepea@git> 2.0-2
 - remove linux user crontab before removing user (embeepea@git)
 
