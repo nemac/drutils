@@ -1,7 +1,7 @@
 Summary: nappl - nemac application manager
 Name: nappl
 Version: 2.4
-Release: 1
+Release: 2
 License: GPL
 Group: Web Development
 Source: %{name}-%{version}.tar.gz
@@ -70,6 +70,10 @@ rm -rf %{buildroot}
 %dir /dumps
 
 %changelog
+* Fri Dec 05 2014 Mark Phillips <embeepea@git> 2.4-2
+- change tito to bump release instead of version when tagging (embeepea@git)
+- fix crontab (embeepea@git)
+
 * Fri Dec 05 2014 Mark Phillips <embeepea@git> 2.4-1
 - touch cron file after installing (embeepea@git)
 
