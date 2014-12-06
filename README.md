@@ -9,16 +9,14 @@ Application Containers
 ----------------------
 
 Nappl makes use of the distinct concepts of *application* and *container*.
-An *application* is any collection of software that needs to be managed as
+An *application* is a collection of software that needs to be managed as
 a project and deployed as a unit to a server.  The following are all
 examples of applications:
 
 * a static html web site
 * a dynamic database-driven web site, such as a Drupal site
-* any dynamic web application
-* an sftp site 
-* a collection of cron jobs that perform regular tasks
-* a MapServer installation that provides OGC web services
+* a collection of programs with a crontab entry that arranges
+  for certain programs to run repeatedly on a regular schedule
 
 For the purposes of Nappl, each application corresponds to a single
 git repository that tracks the history of the files (including
@@ -28,7 +26,10 @@ to function.  For example, a static html web site requires that a web
 server (apache httpd) be present and running.  A Drupal web site
 requires a web server and a MySQL database, and the application's
 files need to be modified to contain the connection information
-(username, password) for that database.
+(username, password) for that database.  An application that requires
+that a program be run regularly on a repeated basis requires that
+a linux user account for that program to run as, and a crontab entry
+for that account which schedules the program execution.
 
 Nappl uses the term *container* to refer to the software prerequisites
 and configuration settings needed for an application.  Think of a
