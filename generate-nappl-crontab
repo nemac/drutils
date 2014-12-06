@@ -47,4 +47,4 @@ if not os.path.isdir(crond):
 
 with open(os.path.join(crond, "nappl"), 'w') as f:
     f.write("# Run the nappl user manager once every minute\n")
-    f.write("* * * * * /usr/bin/nappl-user-manager\n")
+    f.write("* * * * * root /usr/bin/nappl-user-manager\n")
