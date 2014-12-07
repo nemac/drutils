@@ -130,6 +130,10 @@ if os.path.exists("%(APPDIR)s"):
             container = ApacheContainer(appName)
             container.meta = meta
             return container
+        if meta.data['container']['type'] == "plain":
+            container = PlainContainer(appName)
+            container.meta = meta
+            return container
         raise Exception("Unknown container type '%s'" % meta.data['container']['type'])
 
     @staticmethod
@@ -151,3 +155,4 @@ if os.path.exists("%(APPDIR)s"):
 #
 from DrupalContainer import *
 from ApacheContainer import *
+from PlainContainer import *

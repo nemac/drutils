@@ -13,6 +13,7 @@ import re, os, optparse, shutil, json
 from Nappl import *
 from NapplMeta import *
 from Container import *
+from PlainContainer import *
 from ApacheContainer import *
 from DrupalContainer import *
 
@@ -90,6 +91,8 @@ if __name__ == "__main__":
             c = DrupalContainer(appName)
         elif opts.type == "apache":
             c = ApacheContainer(appName)
+        elif opts.type == "plain":
+            c = PlainContainer(appName)
         else:
             raise Exception("unknown container type: %s" % opts.type)
         c.create()
